@@ -1,0 +1,19 @@
+<ul
+  nz-menu
+  [nzMode]="collapsed ? 'vertical' : 'inline'"
+  [ngClass]="{'bg-dark-side text-light': theme === 'dark','bg-light-side': theme === 'light'}"
+>
+  <li
+    *ngFor="let item of menu"
+    nz-submenu
+    [nzTitle]="item.nome"
+    [nzIcon]="item.icon"
+    
+  >
+    <ul [ngClass]="{'bg-dark-side text-light': theme === 'dark','bg-light': theme === 'light'}">
+      <li class="" *ngFor="let subItem of item.submenus" nz-menu-item [routerLink]="subItem.route">
+        <u>{{ subItem.name }}</u>
+      </li>
+    </ul>
+  </li>
+</ul>

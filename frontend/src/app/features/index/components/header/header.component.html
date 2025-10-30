@@ -1,0 +1,14 @@
+<div class="row">
+    <div class="col-1 d-flex justify-content-start align-items-center">
+        <button class="btn btn-sm btn-none" 
+        (click)="onChangeColapsed()">
+        <i class="fa-solid "
+            [ngClass]="{'fa-chevron-right': collapsed, 'fa-chevron-left': !collapsed}"
+        ></i>
+        </button>
+    </div>
+    <div class="col-11 d-flex justify-content-end align-items-center gap-2">
+        <app-notification></app-notification>
+        <app-user-pannel></app-user-pannel>
+    </div>
+</div>

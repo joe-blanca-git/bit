@@ -1,0 +1,24 @@
+<div class="row justify-content-center align-items-center h-100 bg-primary">
+  <div class="col-12 col-sm-6 d-flex justify-content-end">
+    <div class="card card-login-form">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 text-center d-flex flex-column justify-content-center align-items-center">
+            <img class="img-login-logo" src="images/logo/logo-bit.png" alt="">
+            <span class="text-bit h5">Criar Conta</span>
+            <!-- <span class="h3 text-bit">Entrar</span> -->
+          </div>
+          <div class="col-12">
+            <app-register-form></app-register-form>
+          </div>
+          <div class="col-12 mt-5 text-end">
+            <a class="h6" [routerLink]="['/auth/login']" routerLinkActive="router-link-active">Já possui conta? Fazer Login!</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 text-center">
+    <img src="images/wallpapper/login.png" class="wall-login" width="700" alt="art.ts">
+  </div>
+</div>

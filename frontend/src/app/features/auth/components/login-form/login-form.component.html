@@ -1,0 +1,43 @@
+<form [formGroup]="formLogin" (ngSubmit)="onSubmit()" novalidate>
+
+  <!-- E-MAIL -->
+  <div class="mb-3">
+    <label for="email" class="form-label">E-mail</label>
+    <input
+      type="email"
+      id="email"
+      formControlName="email"
+      class="form-control"
+      [ngClass]="{
+        'is-invalid': (f['email'].touched || submitted) && f['email'].invalid,
+        'is-valid': (f['email'].touched || submitted) && f['email'].valid
+      }"
+      required
+    />
+
+
+    <div class="valid-feedback">E-mail válido!</div>
+    <div class="invalid-feedback">
+      O e-mail é obrigatório e deve ser válido.
+    </div>
+  </div>
+
+  <!-- SENHA -->
+  <div class="mb-3">
+    <label for="password" class="form-label">Senha</label>
+    <input
+      type="password"
+      id="password"
+      formControlName="password"
+      class="form-control"
+      [ngClass]="{
+        'is-invalid': (f['password'].touched || submitted) && f['password'].invalid,
+        'is-valid': (f['password'].touched || submitted) && f['password'].valid
+      }"
+      required
+    />
+    <div class="invalid-feedback">A senha é obrigatória!</div>
+  </div>
+
+  <button type="submit" class="btn btn-primary w-100">Entrar</button>
+</form>
