@@ -12,8 +12,11 @@ import { registerLocaleData } from '@angular/common';
 import pt from '@angular/common/locales/pt';
 import { FormsModule } from '@angular/forms';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { AuthGuardService } from './core/guards/auth.guard.ts.service';
+import { AuthService } from './core/auth/auth.service';
+import { ScreenService } from './core/services/screen.service';
+import { errorInterceptor } from './core/interceptors/error-interceptor';
 
 registerLocaleData(pt);
 
@@ -25,8 +28,9 @@ export const appConfig: ApplicationConfig = {
     provideNzI18n(pt_BR),
     importProvidersFrom(FormsModule),
     provideAnimationsAsync(),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([errorInterceptor])),
+    ScreenService,
+    AuthService,
     AuthGuardService,
-
   ],
 };

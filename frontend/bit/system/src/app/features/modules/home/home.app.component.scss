@@ -1,8 +1,12 @@
-.home {
-    background-image: url('../../../../../public/images/logo/logo-bit.png');
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: 25%;
-    height: 100vh;
-    opacity: 0.2;
+.row {
+  scroll-behavior: smooth;
+}
+
+.row::-webkit-scrollbar {
+  height: 6px;
+}
+
+.row::-webkit-scrollbar-thumb {
+  background: rgba(123, 167, 249, 0.527);
+  border-radius: 10px;
 }

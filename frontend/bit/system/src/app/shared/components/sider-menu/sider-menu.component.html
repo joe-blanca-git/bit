@@ -6,13 +6,13 @@
   <li
     *ngFor="let item of menu"
     nz-submenu
-    [nzTitle]="item.nome"
+    [nzTitle]="item.name"
     [nzIcon]="item.icon"
     
   >
     <ul [ngClass]="{'bg-dark-side text-light': theme === 'dark','bg-light': theme === 'light'}">
       <li class="" *ngFor="let subItem of item.submenus" nz-menu-item [routerLink]="subItem.route">
-        <u>{{ subItem.name }}</u>
+        <u [routerLink]="subItem.route">{{ subItem.name }}</u>
       </li>
     </ul>
   </li>

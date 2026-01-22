@@ -17,41 +17,43 @@ export class AuthGuardService {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
-    //verifica se usuario está logado
-    const isLoggedIn = this.authService.loggedIn;
+    // //verifica se usuario está logado
+    // const isLoggedIn = this.authService.loggedIn;
 
-    //redireciona de /setup/home para /index/home
-    if (state.url === '/setup/home') {
-      this.router.navigate(['/index/home']);
-      return false; // Cancela a navegação atual para /setup/home
-    }
+    // //redireciona de /setup/home para /index/home
+    // if (state.url === '/setup/home') {
+    //   this.router.navigate(['/index/home']);
+    //   return false; // Cancela a navegação atual para /setup/home
+    // }
 
-    //verifica se a rota é de configuração
-    const isAuthForm = ['login', 'recovery-password', 'update-password', 'register'].includes(
-      route.routeConfig?.path || defaultPath
-    );
+    // //verifica se a rota é de configuração
+    // const isAuthForm = ['login', 'recovery-password', 'update-password', 'register'].includes(
+    //   route.routeConfig?.path || defaultPath
+    // );
 
-    //verifica se token é válido
-    if (isLoggedIn && !this.authService.isTokenValid()) {
-      console.log('aqui');
-      this.authService.logOut();
-      this.router.navigate(['/auth/login']);
-      return false;
-    }
+    // //verifica se token é válido
+    // if (isLoggedIn && !this.authService.isTokenValid()) {
+    //   console.log('aqui');
+    //   this.authService.logOut();
+    //   this.router.navigate(['/auth/login']);
+    //   return false;
+    // }
 
-    // //se estiver logado e tentar acessar rotas de configuração, retorna para home
-    if (isLoggedIn && isAuthForm) {
-      this.authService._lastAuthenticatedPath = defaultPath;
-      this.router.navigate([defaultPath]);
-      return false;
-    }
+    // // //se estiver logado e tentar acessar rotas de configuração, retorna para home
+    // if (isLoggedIn && isAuthForm) {
+    //   this.authService._lastAuthenticatedPath = defaultPath;
+    //   this.router.navigate([defaultPath]);
+    //   return false;
+    // }
 
-    //se nao estiver logado e nem estiver em rota de configuração, retorna para login
-    if (!isLoggedIn && !isAuthForm) {
-      this.router.navigate(['/auth/login']);
-    }
+    // //se nao estiver logado e nem estiver em rota de configuração, retorna para login
+    // if (!isLoggedIn && !isAuthForm) {
+    //   this.router.navigate(['/auth/login']);
+    // }
 
-    // let routePath = state.url.replace('/', '');
-    return isLoggedIn || isAuthForm;
+    // // let routePath = state.url.replace('/', '');
+    // return isLoggedIn || isAuthForm;
+
+    return true;
   }
 }

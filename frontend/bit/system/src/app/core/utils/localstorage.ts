@@ -1,4 +1,4 @@
-import { loggUser } from '../models/loggUser';
+import { loggUser } from '../../shared/models/loggUser';
 
 export class LocalStorageUtils {
   user: loggUser = new loggUser();

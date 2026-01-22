@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BaseService } from '../../shared/services/base.service';
-import { LocalStorageUtils } from '../../shared/utils/localstorage';
+import { LocalStorageUtils } from '../utils/localstorage';
 import { map, Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { BaseService } from '../services/base.service';
 
 export interface IUser {
   email: string;
@@ -44,7 +44,7 @@ export class AuthService extends BaseService {
   async logOut() {
     this.localStorageUtils.clearLocaleUserData();
     this._user = null;
-    await this.router.navigate(['/auth/login']);
+    await this.router.navigate(['/auth']);
   }
 
   isTokenValid(): boolean {

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import {LoginFormComponent} from '../../components/login-form/login-form.component'
 import { RouterModule } from '@angular/router';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -12,4 +13,11 @@ import { RouterModule } from '@angular/router';
 })
 export class LoginComponent {
 
+  constructor(private toasService: ToastService){
+
+  }
+
+  ngOnInit(): void { 
+
+  }
 }

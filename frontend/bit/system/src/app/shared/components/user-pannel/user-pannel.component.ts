@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { loggUser } from '../../../../shared/models/loggUser';
-import { AuthService } from '../../../../core/auth/auth.service';
+import { AuthService } from '../../../core/auth/auth.service';
+import { loggUser } from '../../models/loggUser';
+
 export interface IOptions {
   name: string;
   description: string;
