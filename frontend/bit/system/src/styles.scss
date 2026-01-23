@@ -13,7 +13,108 @@ $bit-color: #243156;
   color: $bit-color !important;
 }
 
+.text-small {
+  font-size: small;
+}
 
-.breadcrumb{
+.text-smaller {
+  font-size: smaller;
+}
+
+.text-medium {
+  font-size: medium;
+}
+
+.text-large {
+  font-size: large;
+}
+
+.text-larger {
+  font-size: larger;
+}
+
+.breadcrumb {
   color: $bit-color;
+}
+
+/* ===============================
+   NZ-RANGE-PICKER RESPONSIVO
+   Mobile / Tablet
+   =============================== */
+
+@media (max-width: 991px) {
+  ::ng-deep .ant-picker-panel-container .ant-picker-panels {
+    display: block !important;
+    width: min-content !important;
+    overflow-y: auto;
+    max-height: 280px;
+  }
+
+  /* Reduz o tamanho geral do dropdown */
+  .ant-picker-dropdown {
+    transform: scale(0.8);
+    margin: 0 !important;
+  }
+
+  /* Corrige origem do scale conforme posição */
+  .ant-picker-dropdown-placement-bottomLeft,
+  .ant-picker-dropdown-placement-bottomRight {
+    transform-origin: top left;
+  }
+
+  .ant-picker-dropdown-placement-topLeft,
+  .ant-picker-dropdown-placement-topRight {
+    transform-origin: bottom left;
+  }
+
+  /* Remove segundo mês (range picker) */
+  .ant-picker-panel-container {
+    .ant-picker-panels {
+      .ant-picker-panel:last-child {
+        display: none;
+      }
+    }
+  }
+
+  /* Ajusta largura para não sobrar espaço */
+  .ant-picker-panel {
+    width: 100% !important;
+  }
+
+  /* Header menor */
+  .ant-picker-header {
+    padding: 4px 8px;
+  }
+
+  .ant-picker-header-view {
+    font-size: 12px;
+  }
+
+  /* Células do calendário menores */
+  .ant-picker-cell {
+    padding: 2px 0;
+  }
+
+  .ant-picker-cell-inner {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    font-size: 11px;
+  }
+
+  /* Footer menor */
+  .ant-picker-footer {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  /* Texto do input menor */
+  .ant-picker-input > input {
+    font-size: 12px;
+  }
+
+  /* Ícone do calendário menor */
+  .ant-picker-suffix {
+    font-size: 12px;
+  }
 }
