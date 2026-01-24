@@ -1,0 +1,6 @@
+@apiBit_HostAddress = http://localhost:5142
+
+GET {{apiBit_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
