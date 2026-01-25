@@ -115,3 +115,5 @@ C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\obj\Debug\n
 C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\obj\Debug\net8.0\apiBit.pdb
 C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\obj\Debug\net8.0\apiBit.genruntimeconfig.cache
 C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\obj\Debug\net8.0\ref\apiBit.dll
+C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\bin\Debug\net8.0\apiBit.xml
+C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\obj\Debug\net8.0\apiBit.xml

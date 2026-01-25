@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>apiBit</name>
+    </assembly>
+    <members>
+        <member name="M:apiBit.Controllers.AuthController.Register(apiBit.DTOs.RegisterUserDto)">
+            <summary>
+             Registra um novo usuário na plataforma Bit.
+             </summary>
+             <remarks>
+             Example Request:
+             
+                 POST /api/Auth/Register
+                 {
+                     "name": "Jhon Doe",
+                     "email": "jhondoe@email.com",
+                     "password" : "PasswordStrong123@",
+                     "confirmPassword": "PasswordStrong123@"
+                 }
+             
+             Password Requirements:
+             - Mínimo 8 caracteres
+             - Letra Maiúscula e Minúscula
+             - Caractere Especial (!@#)
+             </remarks>
+             <param name="registerDto">Dados do usuário</param>
+             <returns>Message of Success</returns>
+             <response code="200">Usuário criado com sucesso</response>
+             <response code="400">Falha na validação dos dados</response>
+             <response code="200">Erro interno no servidor</response>
+        </member>
+        <member name="T:apiBit.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:apiBit.Migrations.AdicionandoNomeUsuario">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.AdicionandoNomeUsuario.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.AdicionandoNomeUsuario.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.AdicionandoNomeUsuario.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
