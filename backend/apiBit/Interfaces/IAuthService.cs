@@ -6,5 +6,6 @@ namespace apiBit.Interfaces
     public interface IAuthService
     {
         Task<IdentityResult> RegisterUser(RegisterUserDto model);
+        Task<string> Login(LoginUserDto model);
     }
 }

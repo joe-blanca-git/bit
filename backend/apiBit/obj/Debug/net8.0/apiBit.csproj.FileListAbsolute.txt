@@ -117,3 +117,11 @@ C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\obj\Debug\n
 C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\obj\Debug\net8.0\ref\apiBit.dll
 C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\bin\Debug\net8.0\apiBit.xml
 C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\obj\Debug\net8.0\apiBit.xml
+C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\joeder-blanca\Documents\projetos-joe\git\bit\backend\apiBit\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll

@@ -73,6 +73,21 @@ namespace apiBit.Controllers
                     return StatusCode(500, new { message = "Ocorreu um erro interno no servidor. Tente novamente mais tarde."});
                 }
             }
+
+            [HttpPost("login")]
+            [ProducesResponseType(StatusCodes.Status200OK)]
+            [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+            public async Task<IActionResult> Login([FromBody] LoginUserDto loginDto)
+            {
+                var token = await _authService.Login(loginDto);
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Unauthorized(new { message = "Email ou senha inválidos" });
+                }
+
+                return Ok(new { token = token, message = "Login realizado com sucesso!" });
+            }
             
     }
 }

@@ -54,5 +54,17 @@
         <member name="M:apiBit.Migrations.AdicionandoNomeUsuario.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:apiBit.Migrations.CriandoTabelaPeople">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriandoTabelaPeople.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriandoTabelaPeople.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriandoTabelaPeople.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>
