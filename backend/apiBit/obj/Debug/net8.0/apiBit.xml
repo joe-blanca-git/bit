@@ -4,6 +4,32 @@
         <name>apiBit</name>
     </assembly>
     <members>
+        <member name="M:apiBit.Controllers.AddressController.GetAll">
+            <summary>
+             Lista todos os endereços do usuário logado.
+             </summary>
+             <remarks>
+             Example Request:
+             
+                 POST /api/Address
+                 {
+                     "id": "3fa85f64....",
+                     "zipCode": "1400000",
+                     "street": "Rua Abc",
+                     "number": "100",
+                     "complement": "Apto 10",
+                     "city": "São Paulo",
+                     "state": "SP",
+                     "neighborhood": "Centro",
+                     "personId": "3fa85f6...."
+                 }
+             </remarks>
+             <param name="addressDto">Endereços do Usuário</param>
+             <returns>Message of Success</returns>
+             <response code="200">Dados obtidos com sucesso.</response>
+             <response code="400">Falha na validação dos dados</response>
+             <response code="500">Erro interno no servidor</response>
+        </member>
         <member name="M:apiBit.Controllers.AuthController.Register(apiBit.DTOs.RegisterUserDto)">
             <summary>
              Registra um novo usuário na plataforma Bit.
@@ -28,7 +54,47 @@
              <returns>Message of Success</returns>
              <response code="200">Usuário criado com sucesso</response>
              <response code="400">Falha na validação dos dados</response>
-             <response code="200">Erro interno no servidor</response>
+             <response code="500">Erro interno no servidor</response>
+        </member>
+        <member name="M:apiBit.Controllers.AuthController.Login(apiBit.DTOs.LoginUserDto)">
+            <summary>
+             Obtém token.
+             </summary>
+             <remarks>
+             Example Request:
+             
+                 POST /api/Auth/Login
+                 {
+                     "email": "jhondoe@email.com",
+                     "password" : "PasswordStrong123@"
+                 }
+             </remarks>
+             <param name="loginDto">Credenciais do Usuário</param>
+             <returns>Message of Success</returns>
+             <response code="200">Login realizado com sucesso</response>
+             <response code="400">Falha na validação dos dados</response>
+             <response code="500">Erro interno no servidor</response>
+        </member>
+        <member name="M:apiBit.Controllers.CompanyController.GetAll">
+            <summary>
+            Lista todas as empresas do usuário logado.
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.CompanyController.GetById(System.Guid)">
+            <summary>
+            Obtém detalhes de uma empresa específica pelo ID.
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.CompanyController.Create(apiBit.DTOs.CompanyDto)">
+            <summary>
+            Cadastra uma nova empresa com seus endereços.
+            </summary>
+            <param name="model">Dados da empresa e lista de endereços.</param>
+        </member>
+        <member name="M:apiBit.Controllers.CompanyController.Delete(System.Guid)">
+            <summary>
+            Exclui uma empresa e seus endereços.
+            </summary>
         </member>
         <member name="M:apiBit.Controllers.PersonController.UpdateProfile(apiBit.DTOs.PersonDto)">
             <summary>
@@ -52,6 +118,31 @@
             <response code="200">Retorna o objeto Person com os dados.</response>
             <response code="401">Token inválido ou não informado.</response>
             <response code="404">Perfil não encontrado (usuário novo sem cadastro).</response>
+        </member>
+        <member name="M:apiBit.Controllers.PlanController.GetAll">
+            <summary>
+            Lista todos os planos disponíveis (Acesso: Qualquer usuário logado).
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.PlanController.GetById(System.Guid)">
+            <summary>
+            Obtém um plano pelo ID.
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.PlanController.Create(apiBit.DTOs.PlanDto)">
+            <summary>
+            Cria um novo plano (Acesso: Somente Admin ou Dev).
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.PlanController.Update(System.Guid,apiBit.DTOs.PlanDto)">
+            <summary>
+            Atualiza um plano existente (Acesso: Somente Admin ou Dev).
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.PlanController.Delete(System.Guid)">
+            <summary>
+            Exclui um plano (Acesso: Somente Admin ou Dev).
+            </summary>
         </member>
         <member name="T:apiBit.Migrations.InitialCreate">
             <inheritdoc />
@@ -111,6 +202,42 @@
             <inheritdoc />
         </member>
         <member name="M:apiBit.Migrations.AdicionandoState.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:apiBit.Migrations.CriandoTabelaEnderecos">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriandoTabelaEnderecos.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriandoTabelaEnderecos.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriandoTabelaEnderecos.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:apiBit.Migrations.CriandoEmpresas">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriandoEmpresas.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriandoEmpresas.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriandoEmpresas.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:apiBit.Migrations.CriandoPlanos">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriandoPlanos.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriandoPlanos.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriandoPlanos.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>

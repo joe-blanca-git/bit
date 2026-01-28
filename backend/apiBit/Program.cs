@@ -52,6 +52,8 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
+    c.DocumentFilter<SwaggerOrderFilter>();
+
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
@@ -83,6 +85,9 @@ builder.Services
 // Injeção de Dependência dos Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IPlanService, PlanService>();
 
 // Rate Limiter (Proteção contra muitos cliques)
 builder.Services.AddRateLimiter(options =>

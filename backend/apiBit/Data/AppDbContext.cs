@@ -12,6 +12,10 @@ namespace apiBit.Data
         }
 
         public DbSet<Person> People { get; set; }
+        public DbSet<PersonAddress> PersonAddresses { get; set; }
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<CompanyAddress> CompanyAddresses { get; set; }
+        public DbSet<Plan> Plans { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -26,6 +30,16 @@ namespace apiBit.Data
                 .WithOne(a => a.Person)
                 .HasForeignKey(a => a.PersonId)
                 .OnDelete(DeleteBehavior.Cascade);
-        }
+
+                builder.Entity<Company>()
+                    .HasIndex(c => c.Document)
+                    .IsUnique();
+
+                builder.Entity<Company>()
+                    .HasMany(c => c.Addresses)
+                    .WithOne(a => a.Company)
+                    .HasForeignKey(a => a.CompanyId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                    }
     }
 }

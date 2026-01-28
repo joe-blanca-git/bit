@@ -40,7 +40,7 @@ namespace apiBit.Controllers
             /// <returns>Message of Success</returns>
             /// <response code="200">Usuário criado com sucesso</response>
             /// <response code="400">Falha na validação dos dados</response>
-            /// <response code="200">Erro interno no servidor</response>
+            /// <response code="500">Erro interno no servidor</response>
             
             [HttpPost("register")]
             [EnableRateLimiting("AuthLimiter")]
@@ -74,6 +74,23 @@ namespace apiBit.Controllers
                 }
             }
 
+            ///<summary>
+            /// Obtém token.
+            /// </summary>
+            /// <remarks>
+            /// Example Request:
+            /// 
+            ///     POST /api/Auth/Login
+            ///     {
+            ///         "email": "jhondoe@email.com",
+            ///         "password" : "PasswordStrong123@"
+            ///     }
+            /// </remarks>
+            /// <param name="loginDto">Credenciais do Usuário</param>
+            /// <returns>Message of Success</returns>
+            /// <response code="200">Login realizado com sucesso</response>
+            /// <response code="400">Falha na validação dos dados</response>
+            /// <response code="500">Erro interno no servidor</response>
             [HttpPost("login")]
             [ProducesResponseType(StatusCodes.Status200OK)]
             [ProducesResponseType(StatusCodes.Status401Unauthorized)]
