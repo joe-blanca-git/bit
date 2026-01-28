@@ -30,6 +30,29 @@
              <response code="400">Falha na validação dos dados</response>
              <response code="200">Erro interno no servidor</response>
         </member>
+        <member name="M:apiBit.Controllers.PersonController.UpdateProfile(apiBit.DTOs.PersonDto)">
+            <summary>
+            Cria ou Atualiza o perfil do usuário logado.
+            </summary>
+            <remarks>
+            Envie os dados pessoais e uma lista de endereços.
+            </remarks>
+            <response code="200">Perfil salvo com sucesso.</response>
+            <response code="400">Retorna mensagem de erro se os dados forem inválidos.</response>
+            <response code="401">Token inválido ou não informado.</response>
+        </member>
+        <member name="M:apiBit.Controllers.PersonController.GetProfile">
+            <summary>
+            Obtém os dados do perfil do usuário logado.
+            </summary>
+            <remarks>
+            Retorna os dados pessoais e endereços do usuário identificado pelo Token.
+            Se o usuário ainda não completou o cadastro, retorna 404.
+            </remarks>
+            <response code="200">Retorna o objeto Person com os dados.</response>
+            <response code="401">Token inválido ou não informado.</response>
+            <response code="404">Perfil não encontrado (usuário novo sem cadastro).</response>
+        </member>
         <member name="T:apiBit.Migrations.InitialCreate">
             <inheritdoc />
         </member>
@@ -64,6 +87,30 @@
             <inheritdoc />
         </member>
         <member name="M:apiBit.Migrations.CriandoTabelaPeople.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:apiBit.Migrations.AdicionandoEnderecoEColunasPessoa">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.AdicionandoEnderecoEColunasPessoa.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.AdicionandoEnderecoEColunasPessoa.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.AdicionandoEnderecoEColunasPessoa.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:apiBit.Migrations.AdicionandoState">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.AdicionandoState.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.AdicionandoState.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.AdicionandoState.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>

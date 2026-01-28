@@ -14,18 +14,29 @@ namespace apiBit.Models
         public string Name { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(14)]
+        [MaxLength(20)]
         public string Document { get; set; } = string.Empty;
 
         public DateTime BirthDate { get; set; }
 
         [MaxLength(20)]
         public string Phone { get; set; } = string.Empty;
-        
+
+        [MaxLength(20)]
+        public string? PhoneSecondary { get; set; }
+
+        [MaxLength(100)]
+        [EmailAddress]
+        public string? EmailSecondary { get; set; }
+
+        [MaxLength(100)]
+        public string? Position { get; set; }
+
         [Required]
         public string UserId { get; set; } = string.Empty;
 
         [ForeignKey("UserId")]
         public User? User { get; set; }
+        public ICollection<PersonAddress> Addresses { get; set; } = new List<PersonAddress>();
     }
 }

@@ -8,6 +8,11 @@ export const routes: Routes = [
       import('./features/auth/auth.routes').then((r) => r.AUTH_ROUTES),
   },
   {
+    path: 'setup',
+    loadChildren: () =>
+      import('./features/modules/setup/setup.app.route').then((r) => r.SETUP_ROUTES),
+  },
+  {
     path: 'home',
     loadChildren: () =>
       import('./features/modules/home/home.route').then((r) => r.HOME_ROUTES),

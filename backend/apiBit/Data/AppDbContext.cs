@@ -1,5 +1,5 @@
 using apiBit.API.Models;
-using apiBit.Models; // <--- Isso resolve o erro do "Person não encontrado"
+using apiBit.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +20,12 @@ namespace apiBit.Data
             builder.Entity<Person>()
                 .HasIndex(p => p.Document)
                 .IsUnique();
+
+            builder.Entity<Person>()
+                .HasMany(p => p.Addresses)
+                .WithOne(a => a.Person)
+                .HasForeignKey(a => a.PersonId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

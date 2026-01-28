@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { FormatPipe } from '../../../../../../core/pipes/format.pipe';
+import { FormatPipe } from '../../../../../core/pipes/format.pipe';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { endOfMonth } from 'date-fns';
 import { NzSelectModule } from 'ng-zorro-antd/select';
@@ -35,7 +35,7 @@ interface IncomeItem {
   templateUrl: './income.component.html',
   styleUrls: [
     './income.component.scss',
-    '../../../../../../app.component.scss',
+    '../../../../../app.component.scss',
   ],
 })
 export class IncomeComponent {
@@ -55,7 +55,7 @@ export class IncomeComponent {
       description: 'Receitas Pendentes',
       route: '',
       value: 12400,
-      icon: 'fa-solid fa-hand-holding-dollar text-danger',
+      icon: 'fa-solid fa-hand-holding-dollar text-warning',
     },
   ];
 

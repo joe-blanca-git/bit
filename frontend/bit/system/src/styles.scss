@@ -118,3 +118,40 @@ $bit-color: #243156;
     font-size: 12px;
   }
 }
+
+nz-footer {
+  // line-height: 1.5;
+}
+
+nz-sider {
+  line-height: 120px;
+}
+
+nz-content {
+  min-height: 120px;
+  // line-height: 120px;
+}
+
+nz-layout {
+  margin-bottom: 48px;
+}
+
+nz-layout nz-layout,
+nz-layout:last-child {
+  margin: 0;
+  height: 100%;
+}
+
+.ant-layout-header {
+  line-height: 10px;
+}
+
+.ant-table {
+  :host-context(.screen-medium) & {
+    font-size: x-small;
+  }
+
+  :host-context(.screen-large) & {
+    font-size: small;
+  }
+}

@@ -24,7 +24,7 @@ export class UserPannelComponent {
       name: 'Minha Conta',
       description:
         'Acesse as configurações de sua conta e altere e-mail, senha ou configurações de usuário!.',
-      route: 'auth/my-profile',
+      route: 'setup/account',
       icon: 'fa-solid fa-user',
     },
     {

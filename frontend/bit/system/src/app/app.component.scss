@@ -1,48 +1,5 @@
-.content {
-  // padding: 0;
-  // width: 100% !important;
-  // height: 100% !important;
-}
-
 :host {
   text-align: center;
-}
-
-nz-footer {
-  // line-height: 1.5;
-}
-
-nz-sider {
-  line-height: 120px;
-}
-
-nz-content {
-  min-height: 120px;
-  // line-height: 120px;
-}
-
-nz-layout {
-  margin-bottom: 48px;
-}
-
-nz-layout nz-layout,
-nz-layout:last-child {
-  margin: 0;
-  height: 100%;
-}
-
-.ant-layout-header {
-  line-height: 10px;
-}
-
-::ng-deep .ant-table {
-  :host-context(.screen-medium) & {
-    font-size: x-small;
-  }
-
-  :host-context(.screen-large) & {
-    font-size: small;
-  }
 }
 
 .home {
@@ -53,6 +10,26 @@ nz-layout:last-child {
   min-height: 85vh;
   // opacity: 0.2;
   padding: 3vh 2vw;
+}
+
+.setup {
+  // background-image: url('../../../../../public/images/logo/logo-bit.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 25%;
+  min-height: 85vh;
+  // opacity: 0.2;
+  padding: 3vh 2vw;
+
+  .account {
+    .avatar {
+      height: 70px;
+
+      :host-context(.screen-large) & {
+        height: 100px;
+      }
+    }
+  }
 }
 
 .income {
@@ -141,6 +118,4 @@ nz-layout:last-child {
 }
 
 @media (max-width: 991px) {
-
 }
-
