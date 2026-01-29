@@ -6,105 +6,141 @@
     <members>
         <member name="M:apiBit.Controllers.AddressController.GetAll">
             <summary>
-             Lista todos os endereços do usuário logado.
-             </summary>
-             <remarks>
-             Example Request:
-             
-                 POST /api/Address
-                 {
-                     "id": "3fa85f64....",
-                     "zipCode": "1400000",
-                     "street": "Rua Abc",
-                     "number": "100",
-                     "complement": "Apto 10",
-                     "city": "São Paulo",
-                     "state": "SP",
-                     "neighborhood": "Centro",
-                     "personId": "3fa85f6...."
-                 }
-             </remarks>
-             <param name="addressDto">Endereços do Usuário</param>
-             <returns>Message of Success</returns>
-             <response code="200">Dados obtidos com sucesso.</response>
-             <response code="400">Falha na validação dos dados</response>
-             <response code="500">Erro interno no servidor</response>
+            Lista todos os endereços do usuário logado.
+            </summary>
+            <response code="200">Retorna a lista de endereços.</response>
+            <response code="401">Token inválido ou não informado.</response>
+        </member>
+        <member name="M:apiBit.Controllers.AddressController.GetById(System.Guid)">
+            <summary>
+            Obtém um endereço específico pelo ID.
+            </summary>
+            <param name="id">ID do endereço</param>
+            <response code="200">Retorna os dados do endereço.</response>
+            <response code="404">Endereço não encontrado ou não pertence ao usuário.</response>
+            <response code="401">Token inválido ou não informado.</response>
+        </member>
+        <member name="M:apiBit.Controllers.AddressController.Create(apiBit.DTOs.AddressDto)">
+            <summary>
+            Cadastra um novo endereço para o usuário.
+            </summary>
+            <param name="model">Dados do endereço</param>
+            <response code="201">Endereço criado com sucesso.</response>
+            <response code="400">Dados inválidos.</response>
+            <response code="401">Token inválido ou não informado.</response>
+        </member>
+        <member name="M:apiBit.Controllers.AddressController.Update(System.Guid,apiBit.DTOs.AddressDto)">
+            <summary>
+            Atualiza parcialmente um endereço existente.
+            </summary>
+            <param name="id">ID do endereço</param>
+            <param name="model">Novos dados do endereço</param>
+            <response code="200">Endereço atualizado com sucesso.</response>
+            <response code="404">Endereço não encontrado.</response>
+            <response code="401">Token inválido ou não informado.</response>
+        </member>
+        <member name="M:apiBit.Controllers.AddressController.Delete(System.Guid)">
+            <summary>
+            Exclui um endereço.
+            </summary>
+            <param name="id">ID do endereço a ser excluído</param>
+            <response code="204">Endereço excluído com sucesso (sem conteúdo).</response>
+            <response code="404">Endereço não encontrado.</response>
+            <response code="401">Token inválido ou não informado.</response>
         </member>
         <member name="M:apiBit.Controllers.AuthController.Register(apiBit.DTOs.RegisterUserDto)">
             <summary>
-             Registra um novo usuário na plataforma Bit.
-             </summary>
-             <remarks>
-             Example Request:
-             
-                 POST /api/Auth/Register
-                 {
-                     "name": "Jhon Doe",
-                     "email": "jhondoe@email.com",
-                     "password" : "PasswordStrong123@",
-                     "confirmPassword": "PasswordStrong123@"
-                 }
-             
-             Password Requirements:
-             - Mínimo 8 caracteres
-             - Letra Maiúscula e Minúscula
-             - Caractere Especial (!@#)
-             </remarks>
-             <param name="registerDto">Dados do usuário</param>
-             <returns>Message of Success</returns>
-             <response code="200">Usuário criado com sucesso</response>
-             <response code="400">Falha na validação dos dados</response>
-             <response code="500">Erro interno no servidor</response>
+            Registra um novo usuário na plataforma Bit.
+            </summary>
+            <remarks>
+            Cria o usuário no sistema de autenticação. Após isso, o usuário deve completar o perfil em POST /Person/profile.
+            </remarks>
+            <param name="model">Dados de registro (Email e Senha)</param>
+            <response code="200">Usuário criado com sucesso.</response>
+            <response code="400">Dados inválidos ou e-mail já existente.</response>
         </member>
         <member name="M:apiBit.Controllers.AuthController.Login(apiBit.DTOs.LoginUserDto)">
             <summary>
-             Obtém token.
-             </summary>
-             <remarks>
-             Example Request:
-             
-                 POST /api/Auth/Login
-                 {
-                     "email": "jhondoe@email.com",
-                     "password" : "PasswordStrong123@"
-                 }
-             </remarks>
-             <param name="loginDto">Credenciais do Usuário</param>
-             <returns>Message of Success</returns>
-             <response code="200">Login realizado com sucesso</response>
-             <response code="400">Falha na validação dos dados</response>
-             <response code="500">Erro interno no servidor</response>
+            Realiza o login e gera o Token JWT.
+            </summary>
+            <remarks>
+            Retorna o Token de acesso e os dados básicos do usuário.
+            </remarks>
+            <param name="model">Credenciais (Email e Senha)</param>
+            <returns>Token JWT e dados do usuário</returns>
+            <response code="200">Login realizado com sucesso.</response>
+            <response code="400">Dados de entrada inválidos.</response>
+            <response code="401">Email ou senha incorretos.</response>
+        </member>
+        <member name="M:apiBit.Controllers.AuthController.ForgotPassword(apiBit.DTOs.ForgotPasswordDto)">
+            <summary>
+            Envia um e-mail de recuperação de senha.
+            </summary>
+            <remarks>
+            Se o e-mail existir na base, o usuário receberá um link com o token.
+            </remarks>
+        </member>
+        <member name="M:apiBit.Controllers.AuthController.ResetPassword(apiBit.DTOs.ResetPasswordDto)">
+            <summary>
+            Redefine a senha usando o token recebido por e-mail.
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.AuthController.ChangePassword(apiBit.DTOs.ChangePasswordDto)">
+            <summary>
+            Altera a senha do usuário logado.
+            </summary>
+            <remarks>
+            Requer a senha atual para validação.
+            </remarks>
         </member>
         <member name="M:apiBit.Controllers.CompanyController.GetAll">
             <summary>
             Lista todas as empresas do usuário logado.
             </summary>
+            <response code="200">Retorna a lista de empresas.</response>
+            <response code="401">Token inválido ou não informado.</response>
         </member>
         <member name="M:apiBit.Controllers.CompanyController.GetById(System.Guid)">
             <summary>
             Obtém detalhes de uma empresa específica pelo ID.
             </summary>
+            <param name="id">ID da empresa</param>
+            <response code="200">Retorna os dados da empresa.</response>
+            <response code="404">Empresa não encontrada ou não pertence ao usuário.</response>
+            <response code="401">Token inválido ou não informado.</response>
         </member>
         <member name="M:apiBit.Controllers.CompanyController.Create(apiBit.DTOs.CompanyDto)">
             <summary>
             Cadastra uma nova empresa com seus endereços.
             </summary>
+            <remarks>
+            A atividade deve ser 'S' (Serviços), 'V' (Vendas) ou 'T' (Todos).
+            </remarks>
             <param name="model">Dados da empresa e lista de endereços.</param>
+            <response code="201">Empresa criada com sucesso.</response>
+            <response code="400">Dados inválidos (ex: CNPJ duplicado ou atividade incorreta).</response>
+            <response code="401">Token inválido ou não informado.</response>
         </member>
         <member name="M:apiBit.Controllers.CompanyController.Delete(System.Guid)">
             <summary>
             Exclui uma empresa e seus endereços.
             </summary>
+            <param name="id">ID da empresa a ser excluída</param>
+            <response code="204">Empresa excluída com sucesso.</response>
+            <response code="404">Empresa não encontrada.</response>
+            <response code="401">Token inválido ou não informado.</response>
         </member>
         <member name="M:apiBit.Controllers.PersonController.UpdateProfile(apiBit.DTOs.PersonDto)">
             <summary>
             Cria ou Atualiza o perfil do usuário logado.
             </summary>
             <remarks>
-            Envie os dados pessoais e uma lista de endereços.
+            Envie os dados pessoais e uma lista de endereços. 
+            Se o usuário já tiver perfil, os dados serão atualizados e os endereços substituídos.
             </remarks>
+            <param name="model">DTO contendo dados pessoais e endereços</param>
             <response code="200">Perfil salvo com sucesso.</response>
-            <response code="400">Retorna mensagem de erro se os dados forem inválidos.</response>
+            <response code="400">Dados inválidos (ex: CPF já existe em outra conta).</response>
             <response code="401">Token inválido ou não informado.</response>
         </member>
         <member name="M:apiBit.Controllers.PersonController.GetProfile">
@@ -123,26 +159,47 @@
             <summary>
             Lista todos os planos disponíveis (Acesso: Qualquer usuário logado).
             </summary>
+            <response code="200">Retorna a lista de planos.</response>
+            <response code="401">Token inválido ou não informado.</response>
         </member>
         <member name="M:apiBit.Controllers.PlanController.GetById(System.Guid)">
             <summary>
             Obtém um plano pelo ID.
             </summary>
+            <param name="id">ID do plano</param>
+            <response code="200">Retorna os dados do plano.</response>
+            <response code="404">Plano não encontrado.</response>
+            <response code="401">Token inválido ou não informado.</response>
         </member>
         <member name="M:apiBit.Controllers.PlanController.Create(apiBit.DTOs.PlanDto)">
             <summary>
             Cria um novo plano (Acesso: Somente Admin ou Dev).
             </summary>
+            <param name="model">Dados do novo plano</param>
+            <response code="201">Plano criado com sucesso.</response>
+            <response code="403">Usuário não tem permissão (Requer role Admin ou Dev).</response>
+            <response code="401">Token inválido ou não informado.</response>
         </member>
         <member name="M:apiBit.Controllers.PlanController.Update(System.Guid,apiBit.DTOs.PlanDto)">
             <summary>
             Atualiza um plano existente (Acesso: Somente Admin ou Dev).
             </summary>
+            <param name="id">ID do plano a ser atualizado</param>
+            <param name="model">Novos dados do plano</param>
+            <response code="200">Plano atualizado com sucesso.</response>
+            <response code="404">Plano não encontrado.</response>
+            <response code="403">Usuário não tem permissão (Requer role Admin ou Dev).</response>
+            <response code="401">Token inválido ou não informado.</response>
         </member>
         <member name="M:apiBit.Controllers.PlanController.Delete(System.Guid)">
             <summary>
             Exclui um plano (Acesso: Somente Admin ou Dev).
             </summary>
+            <param name="id">ID do plano a ser excluído</param>
+            <response code="204">Plano excluído com sucesso.</response>
+            <response code="404">Plano não encontrado.</response>
+            <response code="403">Usuário não tem permissão (Requer role Admin ou Dev).</response>
+            <response code="401">Token inválido ou não informado.</response>
         </member>
         <member name="T:apiBit.Migrations.InitialCreate">
             <inheritdoc />

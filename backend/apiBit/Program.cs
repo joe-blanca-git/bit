@@ -88,6 +88,7 @@ builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IPlanService, PlanService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Rate Limiter (Proteção contra muitos cliques)
 builder.Services.AddRateLimiter(options =>

@@ -24,10 +24,12 @@ namespace apiBit.Controllers
         /// Cria ou Atualiza o perfil do usuário logado.
         /// </summary>
         /// <remarks>
-        /// Envie os dados pessoais e uma lista de endereços.
+        /// Envie os dados pessoais e uma lista de endereços. 
+        /// Se o usuário já tiver perfil, os dados serão atualizados e os endereços substituídos.
         /// </remarks>
+        /// <param name="model">DTO contendo dados pessoais e endereços</param>
         /// <response code="200">Perfil salvo com sucesso.</response>
-        /// <response code="400">Retorna mensagem de erro se os dados forem inválidos.</response>
+        /// <response code="400">Dados inválidos (ex: CPF já existe em outra conta).</response>
         /// <response code="401">Token inválido ou não informado.</response>
         [HttpPost("profile")]
         [ProducesResponseType(typeof(Person), StatusCodes.Status200OK)]
@@ -64,7 +66,7 @@ namespace apiBit.Controllers
         /// <response code="401">Token inválido ou não informado.</response>
         /// <response code="404">Perfil não encontrado (usuário novo sem cadastro).</response>
         [HttpGet("profile")]
-        [ProducesResponseType(typeof(Person), StatusCodes.Status200OK)] // <--- Retorna UM Person (não lista)
+        [ProducesResponseType(typeof(Person), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetProfile()
@@ -79,7 +81,7 @@ namespace apiBit.Controllers
                 return NotFound(new ErrorResponseDto 
                 { 
                     Message = "Perfil não encontrado.", 
-                    Errors = new[] { "Complete seu cadastro usando o método POST primeiro." } 
+                    Errors = new[] { "Complete seu cadastro em POST /profile antes de realizar buscas." } 
                 });
             }
 

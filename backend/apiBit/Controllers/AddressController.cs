@@ -20,32 +20,14 @@ namespace apiBit.Controllers
             _addressService = addressService;
         }
 
-        ///<summary>
+        /// <summary>
         /// Lista todos os endereços do usuário logado.
         /// </summary>
-        /// <remarks>
-        /// Example Result:
-        /// 
-        ///     GET /api/Address
-        ///     {
-        ///         "id": "3fa85f64....",
-        ///         "zipCode": "1400000",
-        ///         "street": "Rua Abc",
-        ///         "number": "100",
-        ///         "complement": "Apto 10",
-        ///         "city": "São Paulo",
-        ///         "state": "SP",
-        ///         "neighborhood": "Centro",
-        ///         "personId": "3fa85f6...."
-        ///     }
-        /// </remarks>
-        /// <param name="addressDto">Endereços do Usuário</param>
-        /// <returns>Message of Success</returns>
-        /// <response code="200">Dados obtidos com sucesso.</response>
-        /// <response code="400">Falha na validação dos dados</response>
-        /// <response code="500">Erro interno no servidor</response>
+        /// <response code="200">Retorna a lista de endereços.</response>
+        /// <response code="401">Token inválido ou não informado.</response>
         [HttpGet]
         [ProducesResponseType(typeof(List<PersonAddress>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetAll()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -55,25 +37,41 @@ namespace apiBit.Controllers
             return Ok(addresses);
         }
 
-        // GET: api/Address/{id} (Pega um só)
+        /// <summary>
+        /// Obtém um endereço específico pelo ID.
+        /// </summary>
+        /// <param name="id">ID do endereço</param>
+        /// <response code="200">Retorna os dados do endereço.</response>
+        /// <response code="404">Endereço não encontrado ou não pertence ao usuário.</response>
+        /// <response code="401">Token inválido ou não informado.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(PersonAddress), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
 
             var address = await _addressService.GetById(userId, id);
-            if (address == null) return NotFound(new { message = "Endereço não encontrado." });
+            
+            if (address == null) 
+                return NotFound(new ErrorResponseDto { Message = "Endereço não encontrado." });
 
             return Ok(address);
         }
 
-        // POST: api/Address (Cria novo)
+        /// <summary>
+        /// Cadastra um novo endereço para o usuário.
+        /// </summary>
+        /// <param name="model">Dados do endereço</param>
+        /// <response code="201">Endereço criado com sucesso.</response>
+        /// <response code="400">Dados inválidos.</response>
+        /// <response code="401">Token inválido ou não informado.</response>
         [HttpPost]
         [ProducesResponseType(typeof(PersonAddress), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Create([FromBody] AddressDto model)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -82,19 +80,30 @@ namespace apiBit.Controllers
             try
             {
                 var newAddress = await _addressService.Add(userId, model);
-                // Retorna 201 Created com o link para buscar o item criado
                 return CreatedAtAction(nameof(GetById), new { id = newAddress.Id }, newAddress);
             }
             catch (Exception ex)
             {
-                return BadRequest(new ErrorResponseDto { Message = "Erro ao criar endereço", Errors = new[] { ex.Message } });
+                return BadRequest(new ErrorResponseDto 
+                { 
+                    Message = "Erro ao criar endereço", 
+                    Errors = new[] { ex.Message } 
+                });
             }
         }
 
-        // PATCH: api/Address/{id} (Atualiza)
+        /// <summary>
+        /// Atualiza parcialmente um endereço existente.
+        /// </summary>
+        /// <param name="id">ID do endereço</param>
+        /// <param name="model">Novos dados do endereço</param>
+        /// <response code="200">Endereço atualizado com sucesso.</response>
+        /// <response code="404">Endereço não encontrado.</response>
+        /// <response code="401">Token inválido ou não informado.</response>
         [HttpPatch("{id}")]
         [ProducesResponseType(typeof(PersonAddress), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Update(Guid id, [FromBody] AddressDto model)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -103,15 +112,22 @@ namespace apiBit.Controllers
             var updatedAddress = await _addressService.Update(userId, id, model);
             
             if (updatedAddress == null) 
-                return NotFound(new { message = "Endereço não encontrado ou não pertence a você." });
+                return NotFound(new ErrorResponseDto { Message = "Endereço não encontrado ou não pertence a você." });
 
             return Ok(updatedAddress);
         }
 
-        // DELETE: api/Address/{id} (Apaga)
+        /// <summary>
+        /// Exclui um endereço.
+        /// </summary>
+        /// <param name="id">ID do endereço a ser excluído</param>
+        /// <response code="204">Endereço excluído com sucesso (sem conteúdo).</response>
+        /// <response code="404">Endereço não encontrado.</response>
+        /// <response code="401">Token inválido ou não informado.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Delete(Guid id)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -120,9 +136,9 @@ namespace apiBit.Controllers
             var success = await _addressService.Delete(userId, id);
             
             if (!success) 
-                return NotFound(new { message = "Endereço não encontrado." });
+                return NotFound(new ErrorResponseDto { Message = "Endereço não encontrado." });
 
-            return NoContent(); // 204 = Deletado com sucesso, sem conteúdo de volta
+            return NoContent();
         }
     }
 }

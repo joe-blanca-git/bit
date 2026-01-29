@@ -7,6 +7,6 @@ namespace apiBit.Interfaces
     {
         Task<Person> CreateOrUpdateProfile(string userId, PersonDto model);
 
-        Task<Person> GetProfileByUserId(string userId);
+        Task<Person?> GetProfileByUserId(string userId);
     } 
 }
