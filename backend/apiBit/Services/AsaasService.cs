@@ -20,8 +20,10 @@ namespace apiBit.Services
             var baseUrl = _configuration["Asaas:BaseUrl"];
             var apiKey = _configuration["Asaas:ApiKey"];
 
+            // Configuração Básica do Cliente HTTP
             _httpClient.BaseAddress = new Uri(baseUrl);
             _httpClient.DefaultRequestHeaders.Add("access_token", apiKey);
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "BitSystem/1.0"); // Identificação para não ser bloqueado
         }
 
         public async Task<string> CreateCustomer(User user, CreditCardHolderInfoDto holderInfo)
@@ -34,7 +36,7 @@ namespace apiBit.Services
                 postalCode = holderInfo.PostalCode,
                 addressNumber = holderInfo.AddressNumber,
                 phone = holderInfo.Phone,
-                externalReference = user.Id 
+                externalReference = user.Id
             };
 
             var content = new StringContent(JsonSerializer.Serialize(customerData), Encoding.UTF8, "application/json");
@@ -44,6 +46,7 @@ namespace apiBit.Services
 
             if (!response.IsSuccessStatusCode)
             {
+                Console.WriteLine($"ERRO ASAAS CUSTOMER: {responseString}");
                 throw new Exception($"Erro ao criar cliente no Asaas: {responseString}");
             }
 
@@ -51,8 +54,8 @@ namespace apiBit.Services
             return doc.RootElement.GetProperty("id").GetString() ?? "";
         }
 
-       // Adicione o parâmetro 'holderInfo' aqui na assinatura para bater com a Interface
-        public async Task<string> CreatePayment(string customerId, decimal value, CreditCardDto card, CreditCardHolderInfoDto holderInfo, string externalOrderId)
+        // CORRIGIDO: Agora retorna ID e STATUS
+        public async Task<(string id, string status)> CreatePayment(string customerId, decimal value, CreditCardDto card, CreditCardHolderInfoDto holderInfo, string externalOrderId)
         {
             var paymentData = new
             {
@@ -71,7 +74,6 @@ namespace apiBit.Services
                     ccv = card.Ccv
                 },
                 
-                // Usando os dados que chegaram no parâmetro novo
                 creditCardHolderInfo = new
                 {
                     name = holderInfo.Name,
@@ -90,20 +92,69 @@ namespace apiBit.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                // Dica: Esse log vai aparecer no terminal onde roda o 'dotnet run'
-                Console.WriteLine($"ERRO ASAAS: {responseString}");
+                Console.WriteLine($"ERRO ASAAS PAGAMENTO: {responseString}");
                 throw new Exception($"Erro no pagamento Asaas: {responseString}");
             }
 
             using var doc = JsonDocument.Parse(responseString);
-            
-            // Tenta pegar o ID com segurança
-            if(doc.RootElement.TryGetProperty("id", out var idElement))
+            var root = doc.RootElement;
+
+            if(root.TryGetProperty("id", out var idElement))
             {
-                return idElement.GetString() ?? "";
+                var id = idElement.GetString() ?? "";
+                
+                // Tenta pegar o status, se não vier, assume PENDING
+                var status = "PENDING";
+                if (root.TryGetProperty("status", out var statusElement))
+                {
+                    status = statusElement.GetString() ?? "PENDING";
+                }
+
+                return (id, status);
             }
 
-            return "";
+            throw new Exception("ID do pagamento não retornado pelo Asaas.");
+        }
+
+        public async Task<string> CreatePixCharge(string customerId, decimal value, string externalOrderId)
+        {
+            var paymentData = new
+            {
+                customer = customerId,
+                billingType = "PIX",
+                value = value,
+                dueDate = DateTime.Now.ToString("yyyy-MM-dd"),
+                externalReference = externalOrderId
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(paymentData), Encoding.UTF8, "application/json");
+            
+            var response = await _httpClient.PostAsync("payments", content);
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"ERRO ASAAS PIX: {responseString}");
+                throw new Exception($"Erro ao criar Pix: {responseString}");
+            }
+
+            using var doc = JsonDocument.Parse(responseString);
+            return doc.RootElement.GetProperty("id").GetString() ?? "";
+        }
+
+        public async Task<(string payload, string encodedImage)> GetPixQrCode(string asaasPaymentId)
+        {
+            var response = await _httpClient.GetAsync($"payments/{asaasPaymentId}/pixQrCode");
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode) return ("", "");
+
+            using var doc = JsonDocument.Parse(responseString);
+            
+            var payload = doc.RootElement.GetProperty("payload").GetString() ?? "";
+            var encodedImage = doc.RootElement.GetProperty("encodedImage").GetString() ?? "";
+
+            return (payload, encodedImage);
         }
     }
 }
