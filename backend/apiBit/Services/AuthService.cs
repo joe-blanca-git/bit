@@ -1,4 +1,4 @@
-using apiBit.API.Models; // <--- O User provavelmente está aqui
+using apiBit.Models; // <--- O User provavelmente está aqui
 using apiBit.DTOs;
 using apiBit.Interfaces;
 using apiBit.Models;     // <--- Ou aqui
@@ -55,15 +55,16 @@ namespace apiBit.Services
                 return null;
             }
 
+            // Pega usuario
             var user = await _userManager.FindByEmailAsync(model.Email);
+
+            // Pega as roles do usuário
+            var userRoles = await _userManager.GetRolesAsync(user);
             
-            // --- LÓGICA DE GERAR O TOKEN (INLINE) ---
+            // Gera token
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             
-            // Pega as roles do usuário
-            var userRoles = await _userManager.GetRolesAsync(user);
-
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Email),
@@ -71,7 +72,7 @@ namespace apiBit.Services
                 new Claim("id", user.Id)
             };
 
-            // Adiciona as roles nas claims
+            // Adiciona as roles nas claims dentro do token
             foreach (var role in userRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
@@ -90,10 +91,23 @@ namespace apiBit.Services
             var tokenString = tokenHandler.WriteToken(token);
             // ----------------------------------------
 
+            var accessList = new List<AccessDto>();
+            
+            foreach (var role in userRoles)
+            {
+                accessList.Add(new AccessDto {Type = "Role", Value = "role" });
+            }
+
             return new LoginResponseDto
             {
                 Token = tokenString,
-                Message = "Login realizado com sucesso!"
+                User = new UserDetailDto
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    UserName = user.UserName
+                },
+                Roles = accessList
             };
         }
 

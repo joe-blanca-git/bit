@@ -48,6 +48,33 @@
             <response code="404">Endereço não encontrado.</response>
             <response code="401">Token inválido ou não informado.</response>
         </member>
+        <member name="M:apiBit.Controllers.AppManagerController.GetAll">
+            <summary>
+            Retorna a árvore completa de Apps, Menus e Submenus.
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.AppManagerController.CreateApp(apiBit.DTOs.ApplicationDto)">
+            <summary>
+            Cria um novo Aplicativo (Ex: Bit Admin).
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.AppManagerController.CreateMenu(apiBit.DTOs.MenuDto)">
+            <summary>
+            Cria um Menu Principal (Ex: Financeiro).
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.AppManagerController.CreateSubMenu(apiBit.DTOs.MenuDto)">
+            <summary>
+            Cria um SubMenu (Ex: Contas a Pagar).
+            </summary>
+            <remarks>Necessário informar o ParentMenuId.</remarks>
+        </member>
+        <member name="M:apiBit.Controllers.AppManagerController.SetPermissions(apiBit.DTOs.PlanPermissionDto)">
+            <summary>
+            Define todas as permissões (Apps, Menus, Subs) de um Plano de uma vez.
+            </summary>
+            <remarks>Atenção: Envie a lista COMPLETA. O que não for enviado será removido do plano.</remarks>
+        </member>
         <member name="M:apiBit.Controllers.AuthController.Register(apiBit.DTOs.RegisterUserDto)">
             <summary>
             Registra um novo usuário na plataforma Bit.
@@ -295,6 +322,42 @@
             <inheritdoc />
         </member>
         <member name="M:apiBit.Migrations.CriandoPlanos.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:apiBit.Migrations.CriarTabelasApps">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriarTabelasApps.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriarTabelasApps.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.CriarTabelasApps.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:apiBit.Migrations.TabelasPlanosPermissoes">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.TabelasPlanosPermissoes.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.TabelasPlanosPermissoes.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.TabelasPlanosPermissoes.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:apiBit.Migrations.TabelasFinanceiro">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.TabelasFinanceiro.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.TabelasFinanceiro.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.TabelasFinanceiro.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>

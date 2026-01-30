@@ -1,4 +1,4 @@
-using apiBit.API.Models;
+using apiBit.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 

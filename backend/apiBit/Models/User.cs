@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace apiBit.API.Models
+namespace apiBit.Models
 {
     public class User: IdentityUser
     {

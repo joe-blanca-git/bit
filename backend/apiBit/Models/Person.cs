@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using apiBit.API.Models;
+using apiBit.Models;
 
 namespace apiBit.Models
 {

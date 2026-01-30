@@ -25,7 +25,7 @@ namespace apiBit.Controllers
         /// <response code="200">Retorna a lista de planos.</response>
         /// <response code="401">Token inválido ou não informado.</response>
         [HttpGet]
-        [ProducesResponseType(typeof(List<Plan>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<PlanResponseDto>), StatusCodes.Status200OK)]       
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetAll()
         {

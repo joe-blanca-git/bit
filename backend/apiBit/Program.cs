@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using apiBit.Data;
-using apiBit.API.Models;
+using apiBit.Models;
 using apiBit.Interfaces; 
 using apiBit.Services; 
 using apiBit.DTOs;
@@ -89,6 +89,8 @@ builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IPlanService, PlanService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAppManagerService, AppManagerService>();
+builder.Services.AddHttpClient<IAsaasService, AsaasService>();
 
 // Rate Limiter (Proteção contra muitos cliques)
 builder.Services.AddRateLimiter(options =>

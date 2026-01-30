@@ -24,5 +24,9 @@ namespace apiBit.Models
         // Pode ser nulo caso não tenha preço promocional no momento
         [Column(TypeName = "decimal(18,2)")]
         public decimal? DiscountPrice { get; set; }
+
+        public List<PlanApplication> AllowedApps { get; set; } = new();
+        public List<PlanMenu> AllowedMenus { get; set; } = new();
+        public List<PlanSubMenu> AllowedSubMenus { get; set; } = new();
     }
 }

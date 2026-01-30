@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using apiBit.Data;
 
@@ -11,9 +12,11 @@ using apiBit.Data;
 namespace apiBit.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260129132731_CriarTabelasApps")]
+    partial class CriarTabelasApps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -152,6 +155,74 @@ namespace apiBit.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("apiBit.API.Models.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("apiBit.Models.Application", b =>
@@ -329,116 +400,6 @@ namespace apiBit.Migrations
                     b.ToTable("CompanyAddresses");
                 });
 
-            modelBuilder.Entity("apiBit.Models.Order", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("CompanyId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("apiBit.Models.OrderItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("PlanId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("PlanId");
-
-                    b.ToTable("OrderItems");
-                });
-
-            modelBuilder.Entity("apiBit.Models.Payment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("CardBrand")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("CardLast4")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTime>("DueDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("ExternalId")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Method")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime?>("PaidDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("UrlInvoice")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("Payments");
-                });
-
             modelBuilder.Entity("apiBit.Models.Person", b =>
                 {
                     b.Property<Guid>("Id")
@@ -566,140 +527,6 @@ namespace apiBit.Migrations
                     b.ToTable("Plans");
                 });
 
-            modelBuilder.Entity("apiBit.Models.PlanApplication", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("ApplicationId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("PlanId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationId");
-
-                    b.HasIndex("PlanId", "ApplicationId")
-                        .IsUnique();
-
-                    b.ToTable("PlanApplications");
-                });
-
-            modelBuilder.Entity("apiBit.Models.PlanMenu", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("ApplicationMenuId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("PlanId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationMenuId");
-
-                    b.HasIndex("PlanId", "ApplicationMenuId")
-                        .IsUnique();
-
-                    b.ToTable("PlanMenus");
-                });
-
-            modelBuilder.Entity("apiBit.Models.PlanSubMenu", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("ApplicationSubMenuId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("PlanId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationSubMenuId");
-
-                    b.HasIndex("PlanId", "ApplicationSubMenuId")
-                        .IsUnique();
-
-                    b.ToTable("PlanSubMenus");
-                });
-
-            modelBuilder.Entity("apiBit.Models.User", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -711,7 +538,7 @@ namespace apiBit.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("apiBit.Models.User", null)
+                    b.HasOne("apiBit.API.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -720,7 +547,7 @@ namespace apiBit.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("apiBit.Models.User", null)
+                    b.HasOne("apiBit.API.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -735,7 +562,7 @@ namespace apiBit.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("apiBit.Models.User", null)
+                    b.HasOne("apiBit.API.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -744,7 +571,7 @@ namespace apiBit.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("apiBit.Models.User", null)
+                    b.HasOne("apiBit.API.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -775,7 +602,7 @@ namespace apiBit.Migrations
 
             modelBuilder.Entity("apiBit.Models.Company", b =>
                 {
-                    b.HasOne("apiBit.Models.User", "User")
+                    b.HasOne("apiBit.API.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -795,56 +622,9 @@ namespace apiBit.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("apiBit.Models.Order", b =>
-                {
-                    b.HasOne("apiBit.Models.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("apiBit.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Company");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("apiBit.Models.OrderItem", b =>
-                {
-                    b.HasOne("apiBit.Models.Order", "Order")
-                        .WithMany("Items")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("apiBit.Models.Plan", "Plan")
-                        .WithMany()
-                        .HasForeignKey("PlanId");
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Plan");
-                });
-
-            modelBuilder.Entity("apiBit.Models.Payment", b =>
-                {
-                    b.HasOne("apiBit.Models.Order", "Order")
-                        .WithMany("Payments")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-                });
-
             modelBuilder.Entity("apiBit.Models.Person", b =>
                 {
-                    b.HasOne("apiBit.Models.User", "User")
+                    b.HasOne("apiBit.API.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -864,63 +644,6 @@ namespace apiBit.Migrations
                     b.Navigation("Person");
                 });
 
-            modelBuilder.Entity("apiBit.Models.PlanApplication", b =>
-                {
-                    b.HasOne("apiBit.Models.Application", "Application")
-                        .WithMany()
-                        .HasForeignKey("ApplicationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("apiBit.Models.Plan", "Plan")
-                        .WithMany("AllowedApps")
-                        .HasForeignKey("PlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Application");
-
-                    b.Navigation("Plan");
-                });
-
-            modelBuilder.Entity("apiBit.Models.PlanMenu", b =>
-                {
-                    b.HasOne("apiBit.Models.ApplicationMenu", "ApplicationMenu")
-                        .WithMany()
-                        .HasForeignKey("ApplicationMenuId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("apiBit.Models.Plan", "Plan")
-                        .WithMany("AllowedMenus")
-                        .HasForeignKey("PlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationMenu");
-
-                    b.Navigation("Plan");
-                });
-
-            modelBuilder.Entity("apiBit.Models.PlanSubMenu", b =>
-                {
-                    b.HasOne("apiBit.Models.ApplicationSubMenu", "ApplicationSubMenu")
-                        .WithMany()
-                        .HasForeignKey("ApplicationSubMenuId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("apiBit.Models.Plan", "Plan")
-                        .WithMany("AllowedSubMenus")
-                        .HasForeignKey("PlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationSubMenu");
-
-                    b.Navigation("Plan");
-                });
-
             modelBuilder.Entity("apiBit.Models.Application", b =>
                 {
                     b.Navigation("Menus");
@@ -936,25 +659,9 @@ namespace apiBit.Migrations
                     b.Navigation("Addresses");
                 });
 
-            modelBuilder.Entity("apiBit.Models.Order", b =>
-                {
-                    b.Navigation("Items");
-
-                    b.Navigation("Payments");
-                });
-
             modelBuilder.Entity("apiBit.Models.Person", b =>
                 {
                     b.Navigation("Addresses");
-                });
-
-            modelBuilder.Entity("apiBit.Models.Plan", b =>
-                {
-                    b.Navigation("AllowedApps");
-
-                    b.Navigation("AllowedMenus");
-
-                    b.Navigation("AllowedSubMenus");
                 });
 #pragma warning restore 612, 618
         }
