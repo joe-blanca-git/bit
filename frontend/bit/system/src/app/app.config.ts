@@ -17,6 +17,8 @@ import { AuthGuardService } from './core/guards/auth.guard.ts.service';
 import { AuthService } from './core/auth/auth.service';
 import { ScreenService } from './core/services/screen.service';
 import { errorInterceptor } from './core/interceptors/error-interceptor';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeng/themes/aura';
 
 registerLocaleData(pt);
 
@@ -28,6 +30,14 @@ export const appConfig: ApplicationConfig = {
     provideNzI18n(pt_BR),
     importProvidersFrom(FormsModule),
     provideAnimationsAsync(),
+    providePrimeNG({ 
+        theme: {
+            preset: Aura, // Aqui é onde a "mágica" das cores acontece
+            options: {
+                darkModeSelector: '.my-app-dark' // Opcional: para controlar modo escuro
+            }
+        }
+    }),
     provideHttpClient(withInterceptors([errorInterceptor])),
     ScreenService,
     AuthService,

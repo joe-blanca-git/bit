@@ -1,8 +1,12 @@
+using apiBit.Data;
 using apiBit.DTOs;
 using apiBit.Interfaces;
+using apiBit.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization; 
-using System.Security.Claims;      
+using Microsoft.AspNetCore.Identity; 
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;    
 
 namespace apiBit.Controllers
 {
@@ -12,21 +16,19 @@ namespace apiBit.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly UserManager<User> _userManager;
+        private readonly AppDbContext _context;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, UserManager<User> userManager, AppDbContext context)
         {
             _authService = authService;
+            _userManager = userManager;
+            _context = context;
         }
 
         /// <summary>
         /// Registra um novo usuário na plataforma Bit.
         /// </summary>
-        /// <remarks>
-        /// Cria o usuário no sistema de autenticação. Após isso, o usuário deve completar o perfil em POST /Person/profile.
-        /// </remarks>
-        /// <param name="model">Dados de registro (Email e Senha)</param>
-        /// <response code="200">Usuário criado com sucesso.</response>
-        /// <response code="400">Dados inválidos ou e-mail já existente.</response>
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
@@ -39,7 +41,6 @@ namespace apiBit.Controllers
                 return Ok(new { message = "Usuário registrado com sucesso!" });
             }
 
-            // Converte os erros do Identity para o nosso padrão DTO
             var errorResponse = new ErrorResponseDto
             {
                 Message = "Erro ao registrar usuário",
@@ -52,20 +53,13 @@ namespace apiBit.Controllers
         /// <summary>
         /// Realiza o login e gera o Token JWT.
         /// </summary>
-        /// <remarks>
-        /// Retorna o Token de acesso e os dados básicos do usuário.
-        /// </remarks>
-        /// <param name="model">Credenciais (Email e Senha)</param>
-        /// <returns>Token JWT e dados do usuário</returns>
-        /// <response code="200">Login realizado com sucesso.</response>
-        /// <response code="400">Dados de entrada inválidos.</response>
-        /// <response code="401">Email ou senha incorretos.</response>
         [HttpPost("login")]
-        [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)] // Supondo que você tenha esse DTO ou retorna objeto anônimo
+        [ProducesResponseType(typeof(LoginResponseDto), StatusCodes.Status200OK)] 
         [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)] // <--- AQUI A MÁGICA PARA LIMPAR O SWAGGER
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)] 
         public async Task<IActionResult> Login([FromBody] LoginUserDto model)
         {
+            // 1. Valida credenciais e gera token usando seu Service original
             var result = await _authService.Login(model);
 
             if (result == null)
@@ -73,22 +67,53 @@ namespace apiBit.Controllers
                 return Unauthorized(new { message = "Email ou senha incorretos." });
             }
 
-            return Ok(result);
+            // 2. Busca dados extras para montar o JSON completo
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            
+            // Roles como lista simples
+            var roles = await _userManager.GetRolesAsync(user);
+
+            // Dados da Empresa
+            var company = await _context.Companies
+                                .Include(c => c.Plan)
+                                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+            
+            // Dados do Perfil
+            var person = await _context.People.FirstOrDefaultAsync(p => p.UserId == user.Id);
+
+            // 3. Retorna JSON formatado corretamente
+            return Ok(new
+            {
+                token = result.Token, 
+                user = new
+                {
+                    id = user.Id,
+                    email = user.Email,
+                    name = person != null ? person.Name : user.Name,
+                    userName = user.UserName
+                },
+                roles = roles, 
+                
+                company = company == null ? null : new {
+                    id = company.Id,
+                    name = company.Name,
+                    planId = company.PlanId,
+                    planName = company.Plan?.Name,
+                    status = company.SubscriptionStatus,
+                    expiresAt = company.SubscriptionExpiresAt
+                }
+            });
         }
 
         /// <summary>
         /// Envia um e-mail de recuperação de senha.
         /// </summary>
-        /// <remarks>
-        /// Se o e-mail existir na base, o usuário receberá um link com o token.
-        /// </remarks>
         [HttpPost("forgot-password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto model)
         {
             await _authService.ForgotPassword(model.Email);
-            // Sempre retornamos OK por segurança, para não revelar se o e-mail existe ou não
             return Ok(new { message = "Se o e-mail estiver cadastrado, você receberá um link de recuperação." });
         }
 
@@ -100,6 +125,8 @@ namespace apiBit.Controllers
         [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto model)
         {
+            // AQUI ESTAVA O ERRO: O NOME ERA 'LOGIN' E O CODIGO ERA DE LOGIN.
+            // AGORA ESTÁ CORRIGIDO PARA RESETPASSWORD
             var result = await _authService.ResetPassword(model);
 
             if (result.Succeeded)
@@ -117,9 +144,6 @@ namespace apiBit.Controllers
         /// <summary>
         /// Altera a senha do usuário logado.
         /// </summary>
-        /// <remarks>
-        /// Requer a senha atual para validação.
-        /// </remarks>
         [HttpPost("change-password")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -127,7 +151,6 @@ namespace apiBit.Controllers
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto model)
         {
-            // Pega o e-mail de dentro do token
             var email = User.FindFirst(ClaimTypes.Name)?.Value;
             
             if (email == null) return Unauthorized();

@@ -39,8 +39,7 @@ namespace apiBit.Controllers
                 
                 if (user == null) return Unauthorized(new { message = "Usuário não identificado." });
 
-                // 2. Buscar a Empresa deste Usuário (Dono)
-                // Se o campo no banco for 'OwnerId', mude 'c.UserId' para 'c.OwnerId'
+                // 2. Buscar a Empresa deste Usuário
                 var company = await _context.Companies.FirstOrDefaultAsync(c => c.UserId == userId); 
 
                 if (company == null)
@@ -71,7 +70,7 @@ namespace apiBit.Controllers
                 };
 
                 _context.Orders.Add(order);
-                await _context.SaveChangesAsync(); // Salva para gerar o ID do Pedido (OrderId)
+                await _context.SaveChangesAsync(); // Salva para gerar o ID do Pedido
 
                 // 5. Integração ASAAS: Criar ou Buscar Cliente
                 var asaasCustomerId = await _asaasService.CreateCustomer(user, model.HolderInfo);
@@ -99,7 +98,6 @@ namespace apiBit.Controllers
                         return BadRequest(new { message = "Dados do cartão são obrigatórios." });
 
                     // A. Cria cobrança no Cartão e JÁ PEGA O STATUS (Aprovado ou nao)
-                    // ATENÇÃO: Seu AsaasService precisa retornar a Tupla (id, status) conforme combinamos
                     var result = await _asaasService.CreatePayment(
                         asaasCustomerId, 
                         plan.Price, 
@@ -125,7 +123,7 @@ namespace apiBit.Controllers
                 // Se for cartão, salvamos o final dele para exibir depois
                 if (model.PaymentMethod == "CREDIT_CARD" && model.CreditCard != null)
                 {
-                    payment.CardBrand = "Credit Card"; // O Asaas retorna a bandeira, mas simplificamos aqui
+                    payment.CardBrand = "Credit Card"; 
                     payment.CardLast4 = model.CreditCard.Number.Length > 4 
                         ? model.CreditCard.Number.Substring(model.CreditCard.Number.Length - 4) 
                         : "****";
@@ -137,7 +135,10 @@ namespace apiBit.Controllers
                 if (asaasStatus == "CONFIRMED" || asaasStatus == "RECEIVED")
                 {
                     order.Status = "Completed";
-                    // AQUI FUTURAMENTE: Liberar acesso na tabela Company/Subscriptions
+                    
+                    // === ATIVAÇÃO DA EMPRESA ===
+                    // O pagamento passou, então atualizamos a empresa com o plano e validade
+                    await ActivateCompanySubscription(company.Id, plan.Id);
                 }
                 else
                 {
@@ -152,7 +153,7 @@ namespace apiBit.Controllers
                 return Ok(new { 
                     message = "Pagamento processado!", 
                     orderId = order.Id, 
-                    status = order.Status, // Se vier "Completed", o front redireciona. Se vier "Processing", front espera.
+                    status = order.Status, // Se vier "Completed", o front redireciona.
                     asaasId = asaasPaymentId,
                     paymentMethod = model.PaymentMethod,
                     pixPayload = pixPayload, 
@@ -181,6 +182,25 @@ namespace apiBit.Controllers
             if (order == null) return NotFound();
 
             return Ok(order);
+        }
+
+        // === MÉTODO AUXILIAR PARA ATIVAR O PLANO NA EMPRESA ===
+        private async Task ActivateCompanySubscription(Guid companyId, Guid planId)
+        {
+            // Busca a empresa novamente (ou reutiliza se o contexto já estiver rastreando)
+            var company = await _context.Companies.FindAsync(companyId);
+            
+            if (company != null)
+            {
+                company.PlanId = planId;
+                company.SubscriptionStatus = "Active";
+                
+                // Adiciona 30 dias a partir de hoje (Lógica Mensal Simples)
+                company.SubscriptionExpiresAt = DateTime.UtcNow.AddDays(30);
+
+                _context.Companies.Update(company);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

@@ -14,6 +14,12 @@ import { ScreenService } from './core/services/screen.service';
 import { SiderMenuComponent } from './shared/components/sider-menu/sider-menu.component';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { ToastContainerComponent } from "./shared/components/toast-container/toast-container.component";
+import { DrawerModule } from 'primeng/drawer';
+import { ButtonModule } from 'primeng/button';
+import { AvatarModule } from 'primeng/avatar';
+import { ToolbarModule } from 'primeng/toolbar';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-root',
@@ -27,7 +33,8 @@ import { ToastContainerComponent } from "./shared/components/toast-container/toa
     NzIconModule,
     SiderMenuComponent,
     HeaderComponent,
-    ToastContainerComponent
+    ToastContainerComponent,
+    DrawerModule, ButtonModule, AvatarModule, ToolbarModule, BreadcrumbModule
 ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -39,6 +46,9 @@ export class AppComponent {
       .join(' ');
   }
 
+  items: MenuItem[] | undefined;
+
+  home: MenuItem | undefined;
   isMobile = false;
   isVisibleMenu = true;
   isRouteReady = false;
@@ -70,6 +80,18 @@ export class AppComponent {
         this.isRouteReady = true;
       });
   }
+
+   ngOnInit() {
+        this.items = [
+            { label: 'Electronics' },
+            { label: 'Computer' },
+            { label: 'Accessories' },
+            { label: 'Keyboard' },
+            { label: 'Wireless' }
+        ];
+
+        this.home = { icon: 'pi pi-home', routerLink: '/' };
+    }
 
   onChangeVisibleMenu(event: boolean) {
     this.isVisibleMenu = event;

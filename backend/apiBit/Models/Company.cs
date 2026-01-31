@@ -25,11 +25,19 @@ namespace apiBit.Models
         // Dono da empresa
         [Required]
         public string UserId { get; set; } = string.Empty;
+
+        public string SubscriptionStatus { get; set; } = "Inactive"; // Active, Inactive, Overdue
+        
+        public DateTime? SubscriptionExpiresAt { get; set; }
         
         [JsonIgnore]
         public User? User { get; set; }
 
         // Relacionamento com endereços da empresa
         public List<CompanyAddress> Addresses { get; set; } = new();
+
+        public Guid? PlanId { get; set; }
+        [JsonIgnore]
+        public Plan? Plan { get; set; }
     }
 }

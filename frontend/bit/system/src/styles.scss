@@ -123,10 +123,6 @@ nz-footer {
   // line-height: 1.5;
 }
 
-nz-sider {
-  line-height: 120px;
-}
-
 nz-content {
   min-height: 120px;
   // line-height: 120px;
@@ -154,4 +150,8 @@ nz-layout:last-child {
   :host-context(.screen-large) & {
     font-size: small;
   }
+}
+
+.p-breadcrumb {
+    background: #f0f2f5 !important;
 }

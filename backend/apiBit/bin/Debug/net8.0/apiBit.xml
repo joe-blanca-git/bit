@@ -79,33 +79,16 @@
             <summary>
             Registra um novo usuário na plataforma Bit.
             </summary>
-            <remarks>
-            Cria o usuário no sistema de autenticação. Após isso, o usuário deve completar o perfil em POST /Person/profile.
-            </remarks>
-            <param name="model">Dados de registro (Email e Senha)</param>
-            <response code="200">Usuário criado com sucesso.</response>
-            <response code="400">Dados inválidos ou e-mail já existente.</response>
         </member>
         <member name="M:apiBit.Controllers.AuthController.Login(apiBit.DTOs.LoginUserDto)">
             <summary>
             Realiza o login e gera o Token JWT.
             </summary>
-            <remarks>
-            Retorna o Token de acesso e os dados básicos do usuário.
-            </remarks>
-            <param name="model">Credenciais (Email e Senha)</param>
-            <returns>Token JWT e dados do usuário</returns>
-            <response code="200">Login realizado com sucesso.</response>
-            <response code="400">Dados de entrada inválidos.</response>
-            <response code="401">Email ou senha incorretos.</response>
         </member>
         <member name="M:apiBit.Controllers.AuthController.ForgotPassword(apiBit.DTOs.ForgotPasswordDto)">
             <summary>
             Envia um e-mail de recuperação de senha.
             </summary>
-            <remarks>
-            Se o e-mail existir na base, o usuário receberá um link com o token.
-            </remarks>
         </member>
         <member name="M:apiBit.Controllers.AuthController.ResetPassword(apiBit.DTOs.ResetPasswordDto)">
             <summary>
@@ -116,9 +99,6 @@
             <summary>
             Altera a senha do usuário logado.
             </summary>
-            <remarks>
-            Requer a senha atual para validação.
-            </remarks>
         </member>
         <member name="M:apiBit.Controllers.CompanyController.GetAll">
             <summary>
@@ -358,6 +338,18 @@
             <inheritdoc />
         </member>
         <member name="M:apiBit.Migrations.TabelasFinanceiro.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:apiBit.Migrations.AddSubscriptionFields">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.AddSubscriptionFields.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.AddSubscriptionFields.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.AddSubscriptionFields.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
     </members>

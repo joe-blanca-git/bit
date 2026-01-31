@@ -49,6 +49,9 @@
       </nz-header>
 
       <nz-content>
+        <div class="card flex justify-center border-0 bg-transparent">
+            <p-breadcrumb class="max-w-full" [model]="items" [home]="home" />
+        </div>
         <router-outlet></router-outlet>
       </nz-content>
 
