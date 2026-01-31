@@ -26,6 +26,12 @@ namespace apiBit.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<FinancialCategory> FinancialCategories { get; set; }
+        public DbSet<FinancialAccount> FinancialAccounts { get; set; }
+        public DbSet<FinancialOrigin> FinancialOrigins { get; set; }
+        public DbSet<FinancialTransaction> FinancialTransactions { get; set; }
+        public DbSet<FinancialInstallment> FinancialInstallments { get; set; }
+        public DbSet<FinancialPayment> FinancialPayments { get; set;}
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

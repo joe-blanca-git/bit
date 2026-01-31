@@ -352,5 +352,17 @@
         <member name="M:apiBit.Migrations.AddSubscriptionFields.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:apiBit.Migrations.FinancialModule">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.FinancialModule.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.FinancialModule.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:apiBit.Migrations.FinancialModule.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>
