@@ -137,6 +137,179 @@
             <response code="404">Empresa não encontrada.</response>
             <response code="401">Token inválido ou não informado.</response>
         </member>
+        <member name="M:apiBit.Controllers.FinancialAccountController.GetAll">
+            <summary>
+            Lista todas as contas financeiras (Bancos/Caixas).
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialAccountController.Create(apiBit.DTOs.CreateFinancialAccountDto)">
+            <summary>
+            Cria uma nova conta financeira.
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialAccountController.Update(System.Guid,apiBit.DTOs.UpdateFinancialAccountDto)">
+            <summary>
+            Atualiza uma conta financeira.
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialAccountController.Delete(System.Guid)">
+            <summary>
+            Desativa uma conta financeira.
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialCategoryController.GetAll">
+            <summary>
+            Lista todas as categorias financeiras da empresa.
+            </summary>
+            <remarks>
+            Retorna apenas as categorias vinculadas à empresa do usuário logado.
+            </remarks>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialCategoryController.Create(apiBit.DTOs.CreateFinancialCategoryDto)">
+            <summary>
+            Cria uma nova categoria financeira (Ex: Aluguel, Salário).
+            </summary>
+            <param name="model">Dados da nova categoria</param>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialCategoryController.Update(System.Guid,apiBit.DTOs.UpdateFinancialCategoryDto)">
+            <summary>
+            Atualiza uma categoria existente.
+            </summary>
+            <param name="id">ID da categoria</param>
+            <param name="model">Dados atualizados</param>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialCategoryController.Delete(System.Guid)">
+            <summary>
+            Exclui logicamente uma categoria (Desativa).
+            </summary>
+            <remarks>
+            Não apagamos do banco para manter histórico, apenas marcamos como Inativa.
+            </remarks>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialOriginController.GetAll">
+            <summary>
+            Lista todas as origens de movimentação.
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialOriginController.Create(apiBit.DTOs.CreateFinancialOriginDto)">
+            <summary>
+            Cria uma nova origem.
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialOriginController.Update(System.Guid,apiBit.DTOs.UpdateFinancialOriginDto)">
+            <summary>
+            Atualiza uma origem.
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialOriginController.Delete(System.Guid)">
+            <summary>
+            Desativa uma origem.
+            </summary>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialPaymentController.Pay(apiBit.DTOs.CreateFinancialPaymentDto)">
+            <summary>
+            Realiza a baixa (pagamento ou recebimento) de uma parcela.
+            </summary>
+            <remarks>
+            Este endpoint registra a movimentação financeira (Regime de Caixa) e atualiza o status da parcela.
+            
+            **Cenários Possíveis:**
+            1. **Pagamento Total:** Valor pago == Valor da parcela (Status -> Paid).
+            2. **Pagamento Parcial:** Valor pago &lt; Valor da parcela e `IsFullySettled` = false (Status -> Partial).
+            3. **Pagamento com Desconto:** Valor pago &lt; Valor da parcela e `IsFullySettled` = true (Status -> Paid).
+            4. **Pagamento com Juros:** Valor pago &gt; Valor da parcela (Status -> Paid).
+            </remarks>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialPaymentController.RollbackPayment(System.Guid)">
+            <summary>
+            Estorna (exclui) um pagamento realizado.
+            </summary>
+            <remarks>
+            Ao excluir um pagamento, o status da parcela será recalculado automaticamente 
+            (podendo voltar para 'Open' ou 'Partial').
+            </remarks>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialPaymentController.SettleTransaction(apiBit.DTOs.SettleTransactionDto)">
+            <summary>
+            Quita (baixa) todas as parcelas pendentes de uma transação de uma só vez.
+            </summary>
+            <remarks>
+            Útil para quando o cliente paga a dívida toda ou você quita uma compra parcelada antecipadamente.
+            
+            **Lógica de Distribuição do Valor:**
+            1. O sistema identifica todas as parcelas que NÃO estão totalmente pagas ("Open" ou "Partial").
+            2. As parcelas iniciais recebem o pagamento do valor exato devedor.
+            3. A **última parcela** recebe todo o saldo restante do valor informado.
+               - Se o valor for menor que a dívida total, a diferença é considerada **Desconto**.
+               - Se o valor for maior, a diferença é considerada **Juros/Multa**.
+            4. Todas as parcelas são marcadas como "Paid".
+            </remarks>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialTransactionController.Create(apiBit.DTOs.CreateFinancialTransactionDto)">
+            <summary>
+            Cria um novo lançamento financeiro (Receita ou Despesa) e gera as parcelas.
+            </summary>
+            <remarks>
+            Este endpoint realiza o cálculo automático das parcelas ("split" do valor).
+            
+            **Regras de Cálculo:**
+            - O valor total é dividido pelo número de parcelas.
+            - Eventuais diferenças de centavos (dízimas) são somadas à **última parcela**.
+            - As datas de vencimento são incrementadas mensalmente a partir da `firstDueDate`.
+            
+            **Exemplo de Requisição (Notebook de R$ 3.500,00 em 3x):**
+            
+                POST /api/FinancialTransaction
+                {
+                   "description": "Compra Notebook Dell",
+                   "type": 2,                           // 1 = Receita, 2 = Despesa
+                   "totalAmount": 3500.00,
+                   "documentDate": "2026-01-31",        // Data da nota/documento
+                   "installmentsCount": 3,              // Quantidade de parcelas
+                   "firstDueDate": "2026-02-15",        // Vencimento da 1ª parcela
+                   "categoryId": "3fa85f64-5717-4562-b3fc-2c963f66afa6", 
+                   "accountId": null,                   // Pode ser nulo se não souber a conta ainda
+                   "originId": null,
+                   "personId": null
+                }
+            
+            </remarks>
+            <param name="model">Dados da transação e regras de parcelamento</param>
+            <returns>A transação criada e a lista de parcelas geradas</returns>
+            <response code="201">Transação criada com sucesso.</response>
+            <response code="400">Dados inválidos (ex: Valor negativo, Empresa não encontrada).</response>
+            <response code="401">Usuário não autenticado.</response>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialTransactionController.GetAll(apiBit.DTOs.FinancialTransactionFilterDto)">
+            <summary>
+            Lista as transações financeiras com filtros avançados.
+            </summary>
+            <remarks>
+            Permite filtrar por texto (Q), datas, categoria, pessoa, conta, etc.
+            O filtro 'Q' busca no nome da pessoa, descrição, categoria ou nome da conta.
+            </remarks>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialTransactionController.Update(System.Guid,apiBit.DTOs.UpdateFinancialTransactionDto)">
+            <summary>
+            Atualiza uma transação financeira existente e redefini suas parcelas.
+            </summary>
+            <remarks>
+            **Regras de validação:**
+            1. A soma dos valores das parcelas enviadas DEVE ser exatamente igual ao `TotalAmount`.
+            2. Não é permitido alterar valores/parcelas se a transação já possuir parcelas pagas (Status diferente de 'Open').
+            3. O método substitui todas as parcelas antigas pelas novas enviadas no array.
+            </remarks>
+            <param name="id">ID da transação</param>
+            <param name="model">Dados atualizados</param>
+        </member>
+        <member name="M:apiBit.Controllers.FinancialTransactionController.Delete(System.Guid)">
+            <summary>
+            Exclui uma transação e suas parcelas.
+            </summary>
+            <remarks>
+            Só é permitido excluir se NÃO houver pagamentos vinculados.
+            </remarks>
+        </member>
         <member name="M:apiBit.Controllers.PersonController.UpdateProfile(apiBit.DTOs.PersonDto)">
             <summary>
             Cria ou Atualiza o perfil do usuário logado.
@@ -207,6 +380,12 @@
             <response code="404">Plano não encontrado.</response>
             <response code="403">Usuário não tem permissão (Requer role Admin ou Dev).</response>
             <response code="401">Token inválido ou não informado.</response>
+        </member>
+        <member name="P:apiBit.DTOs.CreateFinancialPaymentDto.IsFullySettled">
+            <summary>
+            Indica se este pagamento quita a parcela, mesmo que o valor seja menor (Desconto).
+            Se false e o valor for menor, a parcela fica como 'Partial'.
+            </summary>
         </member>
         <member name="T:apiBit.Migrations.InitialCreate">
             <inheritdoc />

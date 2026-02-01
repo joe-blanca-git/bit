@@ -21,6 +21,10 @@ namespace apiBit.Models
 
         public Guid CompanyId { get; set; }
 
+        public Guid AccountId { get; set; }
+        [JsonIgnore]
+        public FinancialAccount? Account { get; set; }
+
         [Column(TypeName = "decimal(18,2)")]
         public decimal AmountPaid { get; set; }
 
@@ -32,5 +36,6 @@ namespace apiBit.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public string CreatedBy { get; set; } = string.Empty;
+        
     }
 }

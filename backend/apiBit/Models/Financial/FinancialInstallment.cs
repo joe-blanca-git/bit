@@ -22,5 +22,7 @@ namespace apiBit.Models
 
         // Status da Parcela: "Open", "Paid", "Partial", "Overdue"
         public string Status { get; set; } = "Open"; 
+
+        public List<FinancialPayment> Payments { get; set; } = new();
     }
 }
