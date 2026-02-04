@@ -4,73 +4,60 @@ export class LocalStorageUtils {
   user: loggUser = new loggUser();
 
   //shared
-    //gets    
-    public getUser() {
-      const userJson = localStorage.getItem('BITADMIN.user');
-      return userJson ? JSON.parse(userJson) : null;
+  //gets
+  public getUser() {
+    const userJson = localStorage.getItem('BITADMIN.user');
+    return userJson ? JSON.parse(userJson) : null;
+  }
+
+  public getUserToken(): string | null {
+    return localStorage.getItem('BITADMIN.token');
+  }
+
+  public getMenuAllowed(): string | null {
+    const userStorage = localStorage.getItem('BITADMIN.user');
+
+    if (!userStorage) return null;
+
+    try {
+      const userParsed = JSON.parse(userStorage);
+
+      if (!userParsed?.menuAllowed) return null;
+
+      return JSON.stringify(userParsed.menuAllowed);
+    } catch {
+      return null;
     }
+  }
 
-    public getUserToken(): string | null {
-      return localStorage.getItem('BITADMIN.token');
-    }
+  //saves
+  public saveLocaleDataUser(response: any) {
+    this.saveUserToken(response.token);
 
+    this.saveUser(response);
+  }
 
-    public getUserType(): string | null {
-      const claimsString = localStorage.getItem('BITADMIN.user');
+  public saveUserToken(token: string) {
+    localStorage.setItem('BITADMIN.token', token);
+  }
 
-      if (!claimsString) return null;
+  public saveUser(response: any) {
+    this.user.name = String(response.user.name);
+    this.user.id = String(response.user.id);
+    this.user.email = String(response.user.email);
+    this.user.userName = String(response.user.userName);
+    this.user.roles = response.user.roles;
+    this.user.menuAllowed = response.menus;
 
-      const claims = JSON.parse(claimsString);
+    localStorage.setItem('BITADMIN.user', JSON.stringify(this.user) || '');
+  }
 
-      if (!claims?.claims || !Array.isArray(claims.claims)) return null;
-
-      const userTypeClaim = claims.claims.find(
-        (claim: any) => claim.type === 'typeUser'
-      );
-
-      return userTypeClaim?.value?.toUpperCase() || null;
-    }
-
-
-    //saves
-    public saveLocaleDataUser(
-      response: any,
-      negocioId: any,
-      claims: any
-    ) {
-      this.saveUserToken(response.accessToken);
-      this.saveUserRefreshToken(response.refreshToken);
-      this.saveUserClaims(claims);
-      this.saveUser(response);
-    }
-
-    public saveUserToken(token: string) {
-      localStorage.setItem('BITADMIN.token', token);
-    }
-
-    public saveUserRefreshToken(refreshToken: string) {
-      localStorage.setItem('BITADMIN.refreshtoken', refreshToken);
-    }
-
-    public saveUser(response: any) {
-      this.user.name = String(response.userToken.nome);
-      this.user.document = String(response.userToken.documento);
-      this.user.email = String(response.userToken.email);
-      this.user.claims = response.userToken.claims;
-
-      localStorage.setItem('BITADMIN.user', JSON.stringify(this.user) || '');
-    }
-
-    public saveUserClaims(claims: any) {
-      localStorage.setItem('BITADMIN.claims', JSON.stringify(claims));
-    }
-
-    //clear
-    public clearLocaleUserData() {
-      localStorage.removeItem('BITADMIN.token');
-      localStorage.removeItem('BITADMIN.refreshtoken');
-      localStorage.removeItem('BITADMIN.user');
-      localStorage.removeItem('BITADMIN.claims');
-    }
+  //clear
+  public clearLocaleUserData() {
+    localStorage.removeItem('BITADMIN.token');
+    localStorage.removeItem('BITADMIN.refreshtoken');
+    localStorage.removeItem('BITADMIN.user');
+    localStorage.removeItem('BITADMIN.claims');
+  }
   //
 }

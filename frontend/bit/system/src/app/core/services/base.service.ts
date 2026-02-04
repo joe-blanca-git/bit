@@ -1,8 +1,7 @@
 import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-// import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environment/environment';
 import { LocalStorageUtils } from '../utils/localstorage';
-import { throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -13,10 +12,8 @@ export abstract class BaseService {
   constructor() {}
 
   public LocalStorage = new LocalStorageUtils();
-
-  // protected UrlServiceApi: string = environment.apiUrl;
-  // protected UrlServiceLoginV1: string = environment.apiUrlLoginv1;
-  // protected UrlServiceMapaAcesso: string = environment.apiUrlMapaAcesso;
+  protected UrlServiceApi: string = environment.apiUrlBit;
+  protected UrlServiceLoginV1: string = environment.apiUrlLoginv1;
 
   protected GetHeaderJson() {
     return {
@@ -53,9 +50,6 @@ export abstract class BaseService {
   }
 
   protected extractData(response: any) {
-    if (response?.data?.result && response?.status === 0) {
-      return response.data.result;
-    }
 
     return response || {};
   }

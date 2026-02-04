@@ -101,7 +101,9 @@ namespace apiBit.Controllers
                     planName = company.Plan?.Name,
                     status = company.SubscriptionStatus,
                     expiresAt = company.SubscriptionExpiresAt
-                }
+                },
+
+                menus = result.Menus
             });
         }
 

@@ -1,0 +1,12 @@
+.input-group {
+  .invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    display: none; // Esconde por padrão
+  }
+
+  input.is-invalid ~ .invalid-feedback {
+    display: block; // Mostra se estiver inválido
+  }
+}

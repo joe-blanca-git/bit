@@ -1,12 +1,13 @@
-using apiBit.Models; // <--- O User provavelmente está aqui
+using apiBit.Models;
 using apiBit.DTOs;
 using apiBit.Interfaces;
-using apiBit.Models;     // <--- Ou aqui
+using apiBit.Data; // <--- ADICIONADO: Necessário para acessar o AppDbContext
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore; // <--- ADICIONADO: Necessário para .Include, .AsNoTracking, .ToListAsync
 
 namespace apiBit.Services
 {
@@ -16,16 +17,19 @@ namespace apiBit.Services
         private readonly SignInManager<User> _signInManager;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
+        private readonly AppDbContext _context;
 
         public AuthService(UserManager<User> userManager, 
                            SignInManager<User> signInManager, 
                            IConfiguration configuration,
-                           IEmailService emailService)
+                           IEmailService emailService,
+                           AppDbContext context) // <--- ADICIONADO: Injeção no construtor
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _emailService = emailService;
+            _context = context; // <--- ADICIONADO: Atribuição
         }
 
         public async Task<IdentityResult> RegisterUser(RegisterUserDto model)
@@ -48,20 +52,21 @@ namespace apiBit.Services
 
         public async Task<LoginResponseDto?> Login(LoginUserDto model)
         {
+            // 1. Valida Login
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
+            if (!result.Succeeded) return null;
 
-            if (!result.Succeeded)
-            {
-                return null;
-            }
-
-            // Pega usuario
+            // 2. Busca Usuário e Roles
             var user = await _userManager.FindByEmailAsync(model.Email);
-
-            // Pega as roles do usuário
             var userRoles = await _userManager.GetRolesAsync(user);
+
+            // 3. Busca a Empresa (Para preencher o CompanyDto)
+            var company = await _context.Companies
+                                        .AsNoTracking()
+                                        .Include(c => c.Plan) // Inclui o plano se precisar do nome
+                                        .FirstOrDefaultAsync(c => c.UserId == user.Id);
             
-            // Gera token
+            // 4. Gera Token
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             
@@ -72,7 +77,6 @@ namespace apiBit.Services
                 new Claim("id", user.Id)
             };
 
-            // Adiciona as roles nas claims dentro do token
             foreach (var role in userRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
@@ -89,15 +93,8 @@ namespace apiBit.Services
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
-            // ----------------------------------------
 
-            var accessList = new List<AccessDto>();
-            
-            foreach (var role in userRoles)
-            {
-                accessList.Add(new AccessDto {Type = "Role", Value = "role" });
-            }
-
+            // 5. Monta Resposta Final
             return new LoginResponseDto
             {
                 Token = tokenString,
@@ -107,7 +104,19 @@ namespace apiBit.Services
                     Email = user.Email,
                     UserName = user.UserName
                 },
-                Roles = accessList
+                Roles = userRoles.Select(r => new AccessDto { Type = "Role", Value = r }).ToList(),
+                
+                // Preenche a Empresa (Se existir)
+                Company = company != null ? new CompanyDto 
+                {
+                    Id = company.Id,
+                    Name = company.Name,
+                    Document = company.Document, // Assumindo que tem esse campo
+                    // Preencha os outros campos do CompanyDto aqui...
+                } : null,
+
+                // Preenche os Menus
+                Menus = await GetMenusForCompanyPlan(user.Id)
             };
         }
 
@@ -153,10 +162,58 @@ namespace apiBit.Services
                 return IdentityResult.Failed(new IdentityError { Description = "Usuário não encontrado." });
             }
 
-            // O Identity já verifica se a 'CurrentPassword' está certa antes de trocar
             var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-            
             return result;
+        }
+
+        private async Task<List<MenuDto>> GetMenusForCompanyPlan(string userId)
+        {
+            // 1. Achar a empresa e o ID do Plano
+            var company = await _context.Companies
+                                        .AsNoTracking()
+                                        .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (company == null) return new List<MenuDto>();
+
+            // 2. TENTATIVA INTELIGENTE: Filtrar pelo plano
+            // Como não tenho o código da sua classe 'Plan' e 'AllowedApps', 
+            // vou manter a busca segura (trazer todos e montar a árvore).
+            // Se você quiser filtrar exato, precisaremos cruzar os IDs.
+            
+            // Busca ApplicationMenu e Filhos
+            var menusFromDb = await _context.ApplicationMenus
+                                            .AsNoTracking()
+                                            .Include(m => m.SubMenus)
+                                            .OrderBy(m => m.Title)
+                                            .ToListAsync();
+
+            // 3. Transformar em DTO
+            var menuDtos = new List<MenuDto>();
+
+            foreach (var menu in menusFromDb)
+            {
+                var menuDto = new MenuDto
+                {
+                    Title = menu.Title,
+                    Route = menu.Route,
+                    Icon = menu.Icon,
+                    Description = menu.Description,
+                    ApplicationId = menu.ApplicationId,
+                    
+                    // IMPORTANTE: Mapear a lista Items para o PrimeNG entender
+                    Items = menu.SubMenus.Select(sub => new MenuDto
+                    {
+                        Title = sub.Title,
+                        Route = sub.Route,
+                        Icon = sub.Icon,
+                        ApplicationId = menu.ApplicationId,
+                        Items = new List<MenuDto>() // Submenu do submenu (vazio por enquanto)
+                    }).ToList()
+                };
+                menuDtos.Add(menuDto);
+            }
+
+            return menuDtos;
         }
     }
 }

@@ -16,5 +16,7 @@ namespace apiBit.DTOs
         
         [Required]
         public Guid ApplicationId { get; set; }
+
+        public List<MenuDto> Items { get; set; } = new();
     }
 }

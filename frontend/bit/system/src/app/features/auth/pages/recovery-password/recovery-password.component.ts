@@ -8,5 +8,7 @@ import { Component } from '@angular/core';
   styleUrl: './recovery-password.component.scss'
 })
 export class RecoveryPasswordComponent {
+  isLoading = false;
 
+  
 }

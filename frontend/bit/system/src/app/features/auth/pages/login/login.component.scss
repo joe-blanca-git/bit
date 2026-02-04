@@ -3,92 +3,36 @@
   height: 100%;
 }
 
-.login-form {
-  padding: 0 10vw;
-  text-align: center;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(
-    135deg,
-    #0a1a2f 0%,
-    #0f2a44 30%,
-    #143b5f 60%,
-    #0b1f36 100%
-  ) !important;
+.container-fluid {
+  background-image: url("https://materiaisparaprofes.com.br/wp-content/uploads/2022/12/fundo-login-min-1080x720.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.card {
+  background-color: rgba(240, 248, 255, 0.489);
+}
+
+.img-login-logo {
+  width: 200px;
 
   :host-context(.screen-x-small) & {
-    padding: 0 5vw;
+    width: 10rem;
   }
 
   :host-context(.screen-small) & {
-   padding: 0 5vw;
+    width: 12rem;
   }
 
   :host-context(.screen-medium) & {
-    padding: 0 10vw;
+    width: 18rem;
   }
 
   :host-context(.screen-large) & {
-    padding: 0 10vw;
-  }
-
-  .card-login-form {
-
-    background-color: rgba(255, 255, 255, 0.603);
-
-    .img-login-logo {
-      width: 150px;
-      height: auto;
-
-      :host-context(.screen-x-small) & {
-        width: 100px;
-      }
-
-      :host-context(.screen-small) & {
-        width: 120px;
-      }
-
-      :host-context(.screen-medium) & {
-        width: 130px;
-      }
-
-      :host-context(.screen-large) & {
-        width: 140px;
-      }
-    }
-
-    .text-bit {
-      font-size: xx-large;
-
-      :host-context(.screen-x-small) & {
-        font-size: smaller;
-      }
-
-      :host-context(.screen-small) & {
-        font-size: small;
-      }
-
-      :host-context(.screen-medium) & {
-        font-size: medium;
-      }
-
-      :host-context(.screen-large) & {
-        font-size: larger;
-      }
-    }
-  }
-
-  .wall-login {
-    width: 700px;
-
-    :host-context(.screen-small) & {
-      width: 400px;
-    }
-
-    :host-context(.screen-medium) & {
-      width: 400px;
-    }
+    width: 19rem;
   }
 }

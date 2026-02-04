@@ -1,0 +1,111 @@
+<nz-modal [(nzVisible)]="isVisible" [nzTitle]="title" [nzFooter]="footer" [nzWidth]="900" (nzOnCancel)="handleCancel()">
+    <ng-container *nzModalContent>
+        <form nz-form [formGroup]="financialForm" nzLayout="vertical">
+            <div class="row">
+                <div class="col-12 col-md-4">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Pessoa/Cliente</nz-form-label>
+                        <nz-form-control>
+                            <nz-select formControlName="personId" nzPlaceHolder="Selecione...">
+                                <nz-option [nzValue]="1" nzLabel="João Silva"></nz-option>
+                            </nz-select>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Origem</nz-form-label>
+                        <nz-form-control>
+                            <nz-select formControlName="originId" nzPlaceHolder="Selecione...">
+                                <nz-option [nzValue]="1" nzLabel="Venda Direta"></nz-option>
+                            </nz-select>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Categoria</nz-form-label>
+                        <nz-form-control nzErrorTip="Selecione uma categoria.">
+                            <nz-select formControlName="categoryId" nzPlaceHolder="Selecione...">
+                                <nz-option [nzValue]="1" nzLabel="Alimentação"></nz-option>
+                            </nz-select>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+
+                <div class="col-12 col-md-2 ">
+                    <nz-form-item>
+                        <nz-form-label>Pagamento</nz-form-label>
+                        <nz-form-control>
+                            <nz-switch formControlName="isPaid" nzCheckedChildren="Pago" nzUnCheckedChildren="Pendente"></nz-switch>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Valor Total</nz-form-label>
+                        <nz-form-control nzErrorTip="Informe o valor.">
+                            <nz-input-number style="width: 100%" formControlName="totalAmount" [nzMin]="0.01"
+                                [nzFormatter]="formatterReal" [nzParser]="parserReal"></nz-input-number>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Nº de Parcelas</nz-form-label>
+                        <nz-form-control nzErrorTip="Mínimo 1.">
+                            <nz-input-number style="width: 100%" formControlName="installmentsCount"
+                                [nzMin]="1"></nz-input-number>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Vencimento (1ª parcela)</nz-form-label>
+                        <nz-form-control nzErrorTip="Obrigatório.">
+                            <nz-date-picker style="width: 100%" formControlName="firstDueDate"
+                                nzFormat="dd/MM/yyyy"></nz-date-picker>
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+
+                <div class="col-12 mt-4">
+                    <nz-table #basicTable [nzData]="installments" [nzFrontPagination]="false" nzSize="small" [nzScroll]="{ y: '200px' }">
+                        <thead>
+                            <tr>
+                                <th>Nº Parcela</th>
+                                <th>Vencimento</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let data of basicTable.data">
+                                <td>{{ data.number }}</td>
+                                <td>{{ data.dueDate | format:'date' }}</td>
+                                <td>{{ data.value | format:'currency' }}</td>
+                            </tr>
+                        </tbody>
+                    </nz-table>
+                </div>
+            </div>
+        </form>
+    </ng-container>
+
+    <ng-template #footer>
+        <div class="d-flex justify-content-end gap-2">
+          <button class="btn btn-outline-secondary btn-sm" (click)="handleCancel()">
+                <i class="fa fa-xmark" aria-hidden="true"></i>&nbsp;
+                <span>Cancelar</span>
+            </button>
+            <button class="btn btn-primary btn-sm" (click)="handleOk()">
+                <i class="fa fa-check-double"></i>&nbsp;
+                <span>Confirmar</span>
+            </button>
+        </div>
+    </ng-template>
+</nz-modal>

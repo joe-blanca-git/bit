@@ -7,6 +7,7 @@ import { endOfMonth } from 'date-fns';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NewFinancialMovComponent } from "../../components/new-financial-mov/new-financial-mov.component";
 
 interface IncomeItem {
   date: string;
@@ -30,8 +31,9 @@ interface IncomeItem {
     NzDatePickerModule,
     NzSelectModule,
     NzInputModule,
-    NzIconModule
-  ],
+    NzIconModule,
+    NewFinancialMovComponent
+],
   templateUrl: './income.component.html',
   styleUrls: [
     './income.component.scss',
@@ -175,6 +177,7 @@ export class IncomeComponent {
   };
 
   isMobile = false;
+  newFinancialMoveVisible = true;
 
   selectedValue = null;
 

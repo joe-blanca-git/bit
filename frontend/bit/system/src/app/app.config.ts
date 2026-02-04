@@ -32,9 +32,9 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     providePrimeNG({ 
         theme: {
-            preset: Aura, // Aqui é onde a "mágica" das cores acontece
+            preset: Aura,
             options: {
-                darkModeSelector: '.my-app-dark' // Opcional: para controlar modo escuro
+                darkModeSelector: '.my-app-dark'
             }
         }
     }),

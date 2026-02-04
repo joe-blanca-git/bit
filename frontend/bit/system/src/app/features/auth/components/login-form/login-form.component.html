@@ -1,20 +1,24 @@
-<form [formGroup]="formLogin" (ngSubmit)="onSubmit()" novalidate>
-
+<form
+  [formGroup]="formLogin"
+  (ngSubmit)="onSubmit()"
+  novalidate
+  class="ps-xl-5 pe-xl-5"
+>
   <!-- E-MAIL -->
-  <div class="mb-3">
+  <div class="mb-3 ps-xl-5 pe-xl-5">
     <label for="email" class="form-label">E-mail</label>
     <input
+      [disabled]="isLoading"
       type="email"
       id="email"
       formControlName="email"
       class="form-control"
       [ngClass]="{
         'is-invalid': (f['email'].touched || submitted) && f['email'].invalid,
-        'is-valid': (f['email'].touched || submitted) && f['email'].valid
+        'is-valid': (f['email'].touched || submitted) && f['email'].valid,
       }"
       required
     />
-
 
     <div class="valid-feedback">E-mail válido!</div>
     <div class="invalid-feedback">
@@ -23,21 +27,48 @@
   </div>
 
   <!-- SENHA -->
-  <div class="mb-3">
+  <div class="mb-3 ps-xl-5 pe-xl-5">
     <label for="password" class="form-label">Senha</label>
-    <input
-      type="password"
-      id="password"
-      formControlName="password"
-      class="form-control"
-      [ngClass]="{
-        'is-invalid': (f['password'].touched || submitted) && f['password'].invalid,
-        'is-valid': (f['password'].touched || submitted) && f['password'].valid
-      }"
-      required
-    />
-    <div class="invalid-feedback">A senha é obrigatória!</div>
+    <div class="input-group">
+      <input
+        [disabled]="isLoading"
+        [type]="hidePassword ? 'password' : 'text'"
+        id="password"
+        formControlName="password"
+        class="form-control"
+        [ngClass]="{
+          'is-invalid':
+            (f['password'].touched || submitted) && f['password'].invalid,
+          'is-valid':
+            (f['password'].touched || submitted) && f['password'].valid,
+        }"
+        required
+      />
+      <button
+        class="btn btn-outline-secondary rounded-end-2"
+        type="button"
+        (click)="hidePassword = !hidePassword"
+        [disabled]="isLoading"
+      >
+        <i
+          class="fa-solid"
+          [ngClass]="hidePassword ? 'fa-eye-slash' : 'fa-eye'"
+        ></i>
+      </button>
+
+      <div class="invalid-feedback">A senha é obrigatória!</div>
+    </div>
   </div>
 
-  <button type="submit" class="btn btn-primary w-100">Entrar</button>
+  <button [disabled]="isLoading" type="submit" class="btn btn-primary w-50">
+    <i
+      class="fa-solid"
+      [ngClass]="{
+        'fa-door-open': !isLoading,
+        'fa-spin fa-refresh': isLoading,
+      }"
+    ></i>
+    <span *ngIf="isLoading">Verificando dados!</span>
+    <span *ngIf="!isLoading">Entrar</span>
+  </button>
 </form>

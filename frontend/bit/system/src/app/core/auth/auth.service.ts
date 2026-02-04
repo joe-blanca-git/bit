@@ -19,7 +19,10 @@ const defaultPath = '/';
 export class AuthService extends BaseService {
   localStorageUtils = new LocalStorageUtils();
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+  ) {
     super();
   }
 
@@ -28,9 +31,8 @@ export class AuthService extends BaseService {
 
   get loggedIn(): boolean {
     const loggedUser = this.localStorageUtils.getUser();
-    const claims = localStorage.getItem('BIT.claims');
 
-    if (loggedUser && claims) {
+    if (loggedUser) {
       const email = loggedUser.email;
       const name = loggedUser.nome;
       this._user = { email, name };
@@ -41,6 +43,21 @@ export class AuthService extends BaseService {
     return !!this._user;
   }
 
+  login(email: string, password: string): Observable<string> {
+    const body = `{
+      "email" : "${email}",
+      "password": "${password}"
+    }`;
+
+    const url = `${this.UrlServiceLoginV1}login`;
+
+    const response = this.http
+      .post(url, body, this.GetHeaderJson())
+      .pipe(map(this.extractData));
+
+    return response;
+  }
+
   async logOut() {
     this.localStorageUtils.clearLocaleUserData();
     this._user = null;
@@ -49,23 +66,46 @@ export class AuthService extends BaseService {
 
   isTokenValid(): boolean {
     const token = this.localStorageUtils.getUserToken();
-
     if (!token) return false;
 
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
 
-      const exp = payload?.exp * 1000;
-      return Date.now() < exp;
-    } catch (e) {
+    try {
+      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(
+        decodeURIComponent(
+          atob(base64)
+            .split('')
+            .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join(''),
+        ),
+      );
+
+      const now = Date.now();
+
+      // exp e nbf vêm em segundos
+      if (!payload.exp) return false;
+
+      const exp = payload.exp * 1000;
+      const nbf = payload.nbf ? payload.nbf * 1000 : null;
+
+      if (nbf && now < nbf) return false;
+      if (now >= exp) return false;
+
+      return true;
+    } catch {
       return false;
     }
   }
 
-   verifyExitingDocument(document: string, type: string): Observable<{ exists: boolean }> {
-    const url = ''
+  verifyExitingDocument(
+    document: string,
+    type: string,
+  ): Observable<{ exists: boolean }> {
+    const url = '';
     console.log('s');
-    
+
     return this.http.get<{ exists: boolean }>(url, this.GetAuthHeaderJson());
   }
 }

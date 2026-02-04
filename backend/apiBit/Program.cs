@@ -127,6 +127,13 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAngular",
+        policy => policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
+
 var app = builder.Build();
 
 // =========================
@@ -151,6 +158,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors("AllowAngular");
 
 // Seeding de Roles (Criar roles automaticamente)
 using (var scope = app.Services.CreateScope())

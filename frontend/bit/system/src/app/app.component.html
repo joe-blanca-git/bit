@@ -1,63 +1,58 @@
-<div class="content" *ngIf="isRouteReady">
-  <!-- ================= ROTAS LIVRES (LOGIN, AUTH) ================= -->
+<div class="content h-100 overflow-x-hidden" *ngIf="isRouteReady">
   <ng-container *ngIf="isPublicRoute">
     <router-outlet></router-outlet>
   </ng-container>
 
-  <!-- ================= ROTAS PRIVADAS ================= -->
   <nz-layout *ngIf="!isPublicRoute">
+    
     <nz-sider
+      *ngIf="!isMobile"
       nzTheme="light"
       nzCollapsible
       [nzWidth]="200"
-      [nzCollapsedWidth]="isMobile ? 0 : 80"
       [nzTrigger]="null"
-      [nzBreakpoint]="'md'"
       [(nzCollapsed)]="isVisibleMenu"
     >
-      <div class="row">
-        <div class="col-12">
-          <a
-            class="w-100"
-            routerLink="/bit-admin/home"
-            routerLinkActive="router-link-active"
-          >
-            <img
-              src="images/logo/logo-bit.png"
-              height="60"
-              alt=""
-              *ngIf="!isVisibleMenu"
-            />
-            <img
-              src="images/logo/logo-bit-sm.png"
-              height="30"
-              alt=""
-              *ngIf="isVisibleMenu"
-            />
-          </a>
-        </div>
+      <div class="logo-container p-2 text-center">
+        <a routerLink="/bit-admin/home">
+          <img [src]="isVisibleMenu ? 'images/logo/logo-bit-sm.png' : 'images/logo/logo-bit.png'" 
+               [height]="isVisibleMenu ? 30 : 60" />
+        </a>
       </div>
-
       <app-sider-menu [collapsed]="isVisibleMenu"></app-sider-menu>
     </nz-sider>
 
+    <nz-drawer
+      *ngIf="isMobile"
+      nzWidth="200"
+      [nzVisible]="isVisibleMenu"
+      nzPlacement="left" 
+      [nzTitle]="''"
+      [nzClosable]="false"
+      (nzOnClose)="isVisibleMenu = false"
+    >
+      <ng-container *nzDrawerContent>
+        <div class="mb-4 text-center">
+           <img src="images/logo/logo-bit.png" height="60" />
+        </div>
+        <app-sider-menu [collapsed]="false"></app-sider-menu>
+      </ng-container>
+    </nz-drawer>
+
     <nz-layout>
-      <nz-header class="bg-light border p-3">
-        <app-header
-          (collapsedOut)="onChangeVisibleMenu($event)">
-        </app-header>
+      <nz-header class="bg-light border p-0">
+        <app-header (collapsedOut)="onChangeVisibleMenu($event)"></app-header>
       </nz-header>
 
-      <nz-content>
-        <div class="card flex justify-center border-0 bg-transparent">
-            <p-breadcrumb class="max-w-full" [model]="items" [home]="home" />
+      <nz-content class="p-3">
+        <div class="card border-0 bg-transparent mb-3">
+          <p-breadcrumb [model]="items" [home]="home"></p-breadcrumb>
         </div>
         <router-outlet></router-outlet>
       </nz-content>
 
-      <nz-footer>
-        Desenvolvido por
-        <a href="https://joederblanca.com.br">Joeder Blanca</a>
+      <nz-footer class="text-center">
+        Desenvolvido por <a href="https://joederblanca.com.br" target="_blank">Joeder Blanca</a>
       </nz-footer>
     </nz-layout>
   </nz-layout>
