@@ -87,5 +87,27 @@ namespace apiBit.Controllers
 
             return Ok(person);
         }
+
+        /// <summary>
+        /// Lista pessoas cadastradas no sistema.
+        /// </summary>
+        /// <remarks>
+        /// É possível filtrar pelo tipo de usuário (Role).
+        /// Exemplos de filtro: CLIENT, SUPPLIER, CARRIER, OWNER, EMPLOYEE.
+        /// Se o parâmetro 'type' for omitido, retorna todos.
+        /// </remarks>
+        /// <param name="type">Opcional: Tipo do usuário (Role)</param>
+        [HttpGet("list")]
+        [ProducesResponseType(typeof(List<Person>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetAll([FromQuery] string? type)
+        {
+            // Opcional: Se quiser restringir que CLIENTES não vejam a lista completa,
+            // você pode verificar a role do usuário logado aqui.
+            // Ex: if (!User.IsInRole("OWNER") && !User.IsInRole("EMPLOYEE")) return Forbidden();
+
+            var people = await _personService.GetAllProfiles(type);
+            return Ok(people);
+        }
     }
 }

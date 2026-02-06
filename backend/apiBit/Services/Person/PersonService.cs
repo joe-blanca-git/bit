@@ -2,6 +2,7 @@ using apiBit.Data;
 using apiBit.DTOs;
 using apiBit.Interfaces;
 using apiBit.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace apiBit.Services
@@ -9,10 +10,12 @@ namespace apiBit.Services
     public class PersonService : IPersonService
     {
         private readonly AppDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public PersonService(AppDbContext context)
+        public PersonService(AppDbContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<Person?> GetProfileByUserId(string userId)
@@ -63,6 +66,47 @@ namespace apiBit.Services
 
             await _context.SaveChangesAsync();
             return person;
+        }
+
+        public async Task<List<Person>> GetAllProfiles(string? userType = null)
+        {
+            var query = _context.People
+                                .AsNoTracking()
+                                .Include(p => p.Addresses) // Traz os endereços juntos
+                                .AsQueryable();
+
+            // Se não passar tipo, retorna todo mundo
+            if (string.IsNullOrWhiteSpace(userType))
+            {
+                return await query.OrderBy(p => p.Name).ToListAsync();
+            }
+
+            // Se passar tipo (Ex: CLIENT), precisamos achar os usuários dessa role
+            try 
+            {
+                // 1. Busca usuários na Role (Ex: todos os Users que são CLIENT)
+                // O GetUsersInRoleAsync é do Identity e facilita muito nossa vida
+                var usersInRole = await _userManager.GetUsersInRoleAsync(userType.ToUpper());
+                
+                if (usersInRole == null || !usersInRole.Any())
+                {
+                    return new List<Person>(); // Ninguém nessa role
+                }
+
+                // 2. Extrai os IDs desses usuários
+                var userIds = usersInRole.Select(u => u.Id).ToList();
+
+                // 3. Filtra a tabela People onde o UserId esteja na lista
+                query = query.Where(p => userIds.Contains(p.UserId));
+
+                return await query.OrderBy(p => p.Name).ToListAsync();
+            }
+            catch (Exception)
+            {
+                // Se a role não existir (ex: passaram "BATMAN"), o Identity pode lançar erro
+                // ou retornar vazio. Por segurança, retornamos lista vazia.
+                return new List<Person>();
+            }
         }
     
     }

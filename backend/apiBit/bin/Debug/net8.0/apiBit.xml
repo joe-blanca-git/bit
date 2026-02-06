@@ -335,6 +335,17 @@
             <response code="401">Token inválido ou não informado.</response>
             <response code="404">Perfil não encontrado (usuário novo sem cadastro).</response>
         </member>
+        <member name="M:apiBit.Controllers.PersonController.GetAll(System.String)">
+            <summary>
+            Lista pessoas cadastradas no sistema.
+            </summary>
+            <remarks>
+            É possível filtrar pelo tipo de usuário (Role).
+            Exemplos de filtro: CLIENT, SUPPLIER, CARRIER, OWNER, EMPLOYEE.
+            Se o parâmetro 'type' for omitido, retorna todos.
+            </remarks>
+            <param name="type">Opcional: Tipo do usuário (Role)</param>
+        </member>
         <member name="M:apiBit.Controllers.PlanController.GetAll">
             <summary>
             Lista todos os planos disponíveis (Acesso: Qualquer usuário logado).
@@ -381,10 +392,20 @@
             <response code="403">Usuário não tem permissão (Requer role Admin ou Dev).</response>
             <response code="401">Token inválido ou não informado.</response>
         </member>
+        <member name="P:apiBit.DTOs.RegisterFullUserDto.UserType">
+            <summary>
+            Tipo de usuário: "CLIENT", "SUPPLIER" ou "CARRIER"
+            </summary>
+        </member>
         <member name="P:apiBit.DTOs.CreateFinancialPaymentDto.IsFullySettled">
             <summary>
             Indica se este pagamento quita a parcela, mesmo que o valor seja menor (Desconto).
             Se false e o valor for menor, a parcela fica como 'Partial'.
+            </summary>
+        </member>
+        <member name="M:apiBit.Interfaces.IPersonService.GetAllProfiles(System.String)">
+            <summary>
+            Retorna lista de pessoas. Se userType for informado, filtra pela Role.
             </summary>
         </member>
         <member name="T:apiBit.Migrations.InitialCreate">

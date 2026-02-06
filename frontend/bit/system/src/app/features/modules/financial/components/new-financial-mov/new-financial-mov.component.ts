@@ -51,11 +51,37 @@ export class NewFinancialMovComponent implements OnInit {
   public financialForm!: FormGroup;
   public installments: Installment[] = [];
 
+  listPerson: string[] = [];
+
+  isLoadingData = false;
+
+  readonly nzFilterOption = (): boolean => true;
+
   constructor(private fb: FormBuilder, private formatPipe: FormatPipe) {}
 
   ngOnInit(): void {
     this.initForm();
     this.watchChanges();
+  }
+
+  search(value: string): void {
+    
+  }
+
+  async loadData(){
+    this.isLoadingData = true;
+
+    try {
+      
+    } catch (error) {
+      
+    } finally {
+      this.isLoadingData = false;
+    }
+  }
+
+  async getPerson(){
+
   }
 
   private initForm(): void {
@@ -139,4 +165,9 @@ export class NewFinancialMovComponent implements OnInit {
       .replace(',', '.')
       .trim();
   };
+
+  trackByItem(index: number, item: any) {
+  return item;
+}
+
 }

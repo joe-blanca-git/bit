@@ -2,12 +2,25 @@
     <ng-container *nzModalContent>
         <form nz-form [formGroup]="financialForm" nzLayout="vertical">
             <div class="row">
+                
                 <div class="col-12 col-md-4">
                     <nz-form-item>
                         <nz-form-label nzRequired>Pessoa/Cliente</nz-form-label>
                         <nz-form-control>
-                            <nz-select formControlName="personId" nzPlaceHolder="Selecione...">
-                                <nz-option [nzValue]="1" nzLabel="João Silva"></nz-option>
+                             <nz-select
+                                formControlName="personId" 
+                                nzPlaceHolder="Pesquisar..."
+                                nzShowSearch
+                                nzServerSearch
+                                [nzShowArrow]="false"
+                                [nzFilterOption]="nzFilterOption"
+                                (nzOnSearch)="search($event)"
+                                >
+                                <nz-option
+                                    *ngFor="let item of listPerson; trackBy: trackByItem"
+                                    [nzLabel]="item"
+                                    [nzValue]="item">
+                                </nz-option>
                             </nz-select>
                         </nz-form-control>
                     </nz-form-item>

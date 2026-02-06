@@ -18,12 +18,20 @@ namespace apiBit.Controllers
         private readonly IAuthService _authService;
         private readonly UserManager<User> _userManager;
         private readonly AppDbContext _context;
+        private readonly IPersonService _personService;
+        private readonly IEmailService _emailService; // <--- ADICIONADO AQUI
 
-        public AuthController(IAuthService authService, UserManager<User> userManager, AppDbContext context)
+        public AuthController(IAuthService authService, 
+                              UserManager<User> userManager, 
+                              AppDbContext context,
+                              IPersonService personService,
+                              IEmailService emailService) // <--- ADICIONADO NO CONSTRUTOR
         {
             _authService = authService;
             _userManager = userManager;
             _context = context;
+            _personService = personService;
+            _emailService = emailService; // <--- INICIALIZADO AQUI
         }
 
         /// <summary>
@@ -75,11 +83,14 @@ namespace apiBit.Controllers
 
             // Dados da Empresa
             var company = await _context.Companies
-                                .Include(c => c.Plan)
-                                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+                                        .Include(c => c.Plan)
+                                        .AsNoTracking() // Boa prática
+                                        .FirstOrDefaultAsync(c => c.UserId == user.Id);
             
             // Dados do Perfil
-            var person = await _context.People.FirstOrDefaultAsync(p => p.UserId == user.Id);
+            var person = await _context.People
+                                       .AsNoTracking()
+                                       .FirstOrDefaultAsync(p => p.UserId == user.Id);
 
             // 3. Retorna JSON formatado corretamente
             return Ok(new
@@ -89,7 +100,7 @@ namespace apiBit.Controllers
                 {
                     id = user.Id,
                     email = user.Email,
-                    name = person != null ? person.Name : user.Name,
+                    name = person != null ? person.Name : user.UserName,
                     userName = user.UserName
                 },
                 roles = roles, 
@@ -127,8 +138,6 @@ namespace apiBit.Controllers
         [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto model)
         {
-            // AQUI ESTAVA O ERRO: O NOME ERA 'LOGIN' E O CODIGO ERA DE LOGIN.
-            // AGORA ESTÁ CORRIGIDO PARA RESETPASSWORD
             var result = await _authService.ResetPassword(model);
 
             if (result.Succeeded)
@@ -169,6 +178,136 @@ namespace apiBit.Controllers
                 Message = "Erro ao alterar senha", 
                 Errors = result.Errors.Select(e => e.Description).ToArray() 
             });
+        }
+
+        [HttpPost("register-full")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponseDto), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RegisterFull([FromBody] RegisterFullUserDto model)
+        {
+            // 1. Validação do Tipo
+            string roleToAssign = model.UserType.ToUpper();
+            var validRoles = new[] { "CLIENT", "SUPPLIER", "CARRIER" };
+            if (!validRoles.Contains(roleToAssign))
+            {
+                return BadRequest(new ErrorResponseDto { Message = "Tipo de usuário inválido." });
+            }
+
+            // 2. Gerar Senha Aleatória Segura
+            string accessCode = GenerateSecurePassword(); // A "senha" provisória
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                // 3. Criar Usuário
+                var user = new User
+                {
+                    UserName = model.Email,
+                    Email = model.Email
+                };
+
+                // Cria com a senha gerada
+                var createResult = await _userManager.CreateAsync(user, accessCode);
+
+                if (!createResult.Succeeded)
+                {
+                    return BadRequest(new ErrorResponseDto
+                    {
+                        Message = "Erro ao criar usuário",
+                        Errors = createResult.Errors.Select(e => e.Description).ToArray()
+                    });
+                }
+
+                // 4. Vincular Role
+                var roleResult = await _userManager.AddToRoleAsync(user, roleToAssign);
+                if (!roleResult.Succeeded) throw new Exception("Erro ao vincular perfil de acesso.");
+
+                // 5. Criar Perfil (Person)
+                await _personService.CreateOrUpdateProfile(user.Id, model.ProfileData);
+
+                // 6. Confirma a transação no banco
+                await transaction.CommitAsync();
+
+                // -----------------------------------------------------------
+                // 7. ENVIO DE E-MAIL (Só envia se o banco salvou com sucesso)
+                // -----------------------------------------------------------
+                var emailSubject = "Bem-vindo ao Bit System - Seu Código de Acesso";
+                var emailBody = $@"
+                    <h2>Cadastro Realizado com Sucesso!</h2>
+                    <p>Olá, <strong>{model.ProfileData.Name}</strong>.</p>
+                    <p>Seu cadastro foi realizado em nossa plataforma como {roleToAssign}.</p>
+                    <hr>
+                    <p>Para realizar seu primeiro acesso, utilize o e-mail cadastrado e o código abaixo:</p>
+                    <h3 style='background-color: #f3f3f3; padding: 10px; display: inline-block;'>{accessCode}</h3>
+                    <p><strong>Importante:</strong> Este é um código de acesso provisório. Você será solicitado a criar uma nova senha ao entrar.</p>
+                    <hr>
+                    <p>Equipe Bit System</p>";
+
+                // Dispara o e-mail
+                try 
+                {
+                    await _emailService.SendEmailAsync(model.Email, emailSubject, emailBody);
+                }
+                catch
+                {
+                    // Opcional: Logar erro de envio de email. 
+                }
+
+                return Ok(new { message = $"Cadastro realizado! O código de acesso foi enviado para {model.Email}." });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+
+                // === MELHORIA PARA DEBUG ===
+                // Vamos descer até a raiz do erro para saber o que o banco recusou
+                var innerMessage = ex.InnerException?.Message ?? "";
+                
+                // Se houver mais níveis de erro interno, pegamos o último
+                var deepInner = ex.InnerException;
+                while (deepInner?.InnerException != null) 
+                {
+                    deepInner = deepInner.InnerException;
+                    innerMessage = deepInner.Message;
+                }
+                // ============================
+
+                return BadRequest(new ErrorResponseDto
+                {
+                    Message = "Erro ao realizar cadastro completo.",
+                    Errors = new[] { ex.Message, "Detalhe técnico: " + innerMessage }
+                });
+            }
+        }
+
+        private string GenerateSecurePassword()
+        {
+            const string lower = "abcdefghijklmnopqrstuvwxyz";
+            const string upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string digits = "1234567890";
+            const string special = "!@#$%^&*()_-+=";
+
+            var random = new Random();
+            
+            // Garante pelo menos um caractere de cada tipo exigido pelo Identity
+            var passwordChars = new List<char>
+            {
+                lower[random.Next(lower.Length)],
+                upper[random.Next(upper.Length)],
+                digits[random.Next(digits.Length)],
+                special[random.Next(special.Length)]
+            };
+
+            // Preenche o resto até chegar em 10 caracteres
+            const string allChars = lower + upper + digits + special;
+            while (passwordChars.Count < 10)
+            {
+                passwordChars.Add(allChars[random.Next(allChars.Length)]);
+            }
+
+            // Embaralha para não ficar previsível
+            return new string(passwordChars.OrderBy(x => random.Next()).ToArray());
         }
     }
 }
