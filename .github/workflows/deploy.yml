@@ -133,4 +133,4 @@ jobs:
             qFl7430JcpZ5C0LiHmiuGcIePwQwG7yLoeuP/caYZqgp0yK/4X3bDPUj7BUKWYBw9gtFPa
             oUGM7MQ5zxjlAAAADnJvb3RAc3J2NDIwNTc3AQIDBA==
             -----END OPENSSH PRIVATE KEY-----
-          script: sudo systemctl restart minha-api.service
+          script: sudo systemctl restart api-bit.service
