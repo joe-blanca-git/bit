@@ -137,11 +137,12 @@ builder.Services.AddCors(options => {
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowProductionFront",
-        policy => policy.WithOrigins("https://joederblanca@altamogiana.com.br", "http://192.185.213.136")
+        policy => policy.WithOrigins("https://joederblanca.com.br", "http://192.185.213.136")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials());
 });
+
 
 var app = builder.Build();
 
