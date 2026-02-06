@@ -1,0 +1,136 @@
+name: Deploy API .NET
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish (Compilar)
+        run: dotnet publish backend/apibit/*.csproj -c Release -o ./publish
+
+      - name: Enviar arquivos para VPS via SCP
+        uses: appleboy/scp-action@master
+        with:
+          host: 85.31.118.231
+          username: root
+          key: |
+            -----BEGIN OPENSSH PRIVATE KEY-----
+            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
+            -----END OPENSSH PRIVATE KEY-----
+          source: "./publish/*"
+          target: "/var/www/backend"
+          strip_components: 1
+
+      - name: Reiniciar Serviço da API
+        uses: appleboy/ssh-action@master
+        with:
+          host: 85.31.118.231
+          username: root
+          key: |
+            -----BEGIN OPENSSH PRIVATE KEY-----
+            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
+            -----END OPENSSH PRIVATE KEY-----
+          script: sudo systemctl restart minha-api.service

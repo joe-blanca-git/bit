@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -134,7 +135,20 @@ builder.Services.AddCors(options => {
                         .AllowAnyHeader());
 });
 
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowProductionFront",
+        policy => policy.WithOrigins("https://joederblanca@altamogiana.com.br", "http://192.185.213.136")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials());
+});
+
 var app = builder.Build();
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 using (var scope = app.Services.CreateScope())
 {
@@ -162,6 +176,7 @@ app.UseRateLimiter();
 // A ORDEM SAGRADA: Auth -> Authorization
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("AllowProductionFront");
 
 app.MapControllers();
 
