@@ -135,13 +135,13 @@ builder.Services.AddCors(options => {
                         .AllowAnyHeader());
 });
 
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowProductionFront",
-        policy => policy.WithOrigins("https://joederblanca.com.br", "http://192.185.213.136")
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials());
-});
+// builder.Services.AddCors(options => {
+//     options.AddPolicy("AllowProductionFront",
+//         policy => policy.WithOrigins("https://joederblanca.com.br", "http://192.185.213.136")
+//                         .AllowAnyMethod()
+//                         .AllowAnyHeader()
+//                         .AllowCredentials());
+// });
 
 
 var app = builder.Build();
@@ -177,7 +177,7 @@ app.UseRateLimiter();
 // A ORDEM SAGRADA: Auth -> Authorization
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors("AllowProductionFront");
+// app.UseCors("AllowProductionFront");
 
 app.MapControllers();
 

@@ -7,37 +7,67 @@
                     <nz-form-item>
                         <nz-form-label nzRequired>Pessoa/Cliente</nz-form-label>
                         <nz-form-control>
-                             <nz-select
-                                formControlName="personId" 
+                            <nz-select
+                                formControlName="personId"
                                 nzPlaceHolder="Pesquisar..."
                                 nzShowSearch
                                 nzServerSearch
                                 [nzShowArrow]="false"
                                 [nzFilterOption]="nzFilterOption"
                                 (nzOnSearch)="search($event)"
-                                >
+                                [nzDropdownRender]="newPersonTemplate" 
+                            >
                                 <nz-option
-                                    *ngFor="let item of listPerson; trackBy: trackByItem"
-                                    [nzLabel]="item"
-                                    [nzValue]="item">
+                                *ngFor="let item of listPerson; trackBy: trackByItem"
+                                [nzLabel]="item.name"
+                                [nzValue]="item.id"
+                                >
                                 </nz-option>
                             </nz-select>
+
+                            <ng-template #newPersonTemplate>
+                                <nz-divider style="margin: 4px 0;"></nz-divider>
+                                <div style="padding: 8px; cursor: pointer; color: #1890ff;" (click)="onOpenNewModal('newPerson')">
+                                <i class="fa fa-square-plus"></i> Cadastrar
+                                </div>
+                            </ng-template>
                         </nz-form-control>
                     </nz-form-item>
                 </div>
 
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-4">
                     <nz-form-item>
                         <nz-form-label nzRequired>Origem</nz-form-label>
                         <nz-form-control>
-                            <nz-select formControlName="originId" nzPlaceHolder="Selecione...">
-                                <nz-option [nzValue]="1" nzLabel="Venda Direta"></nz-option>
+                            <nz-select
+                                formControlName="originId"
+                                nzPlaceHolder="Pesquisar..."
+                                nzShowSearch
+                                nzServerSearch
+                                [nzShowArrow]="false"
+                                [nzFilterOption]="nzFilterOption"
+                                (nzOnSearch)="search($event)"
+                                [nzDropdownRender]="newOriginTemplate" 
+                            >
+                                <nz-option
+                                *ngFor="let item of listOrigin; trackBy: trackByItem"
+                                [nzLabel]="item.description"
+                                [nzValue]="item.id"
+                                >
+                                </nz-option>
                             </nz-select>
+
+                            <ng-template #newOriginTemplate>
+                                <nz-divider style="margin: 4px 0;"></nz-divider>
+                                <div style="padding: 8px; cursor: pointer; color: #1890ff;" (click)="onOpenNewModal('newOrigin')">
+                                <i class="fa fa-square-plus"></i> Cadastrar
+                                </div>
+                            </ng-template>
                         </nz-form-control>
                     </nz-form-item>
                 </div>
 
-                <div class="col-12 col-md-3">
+                <div class="col-6 col-md-4">
                     <nz-form-item>
                         <nz-form-label nzRequired>Categoria</nz-form-label>
                         <nz-form-control nzErrorTip="Selecione uma categoria.">
@@ -48,7 +78,7 @@
                     </nz-form-item>
                 </div>
 
-                <div class="col-12 col-md-2 ">
+                <div class="col-6 col-md-3">
                     <nz-form-item>
                         <nz-form-label>Pagamento</nz-form-label>
                         <nz-form-control>
@@ -57,7 +87,7 @@
                     </nz-form-item>
                 </div>
 
-                <div class="col-12 col-md-3">
+                <div class="col-6 col-md-3">
                     <nz-form-item>
                         <nz-form-label nzRequired>Valor Total</nz-form-label>
                         <nz-form-control nzErrorTip="Informe o valor.">
@@ -67,7 +97,7 @@
                     </nz-form-item>
                 </div>
 
-                <div class="col-12 col-md-3">
+                <div class="col-6 col-md-3">
                     <nz-form-item>
                         <nz-form-label nzRequired>Nº de Parcelas</nz-form-label>
                         <nz-form-control nzErrorTip="Mínimo 1.">
@@ -122,3 +152,6 @@
         </div>
     </ng-template>
 </nz-modal>
+
+<app-new-person-full [isVisible]="isPersonModalVisible" (saved)="onPersonCreated($event)" (close)="onCloseNewModal('newPerson')"></app-new-person-full>
+<app-new-financial-origin [isVisible]="isOriginModalVisible" (close)="onCloseNewModal('newOrigin')"></app-new-financial-origin>
