@@ -5,24 +5,29 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
+  FormArray,
 } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { forkJoin, lastValueFrom, tap } from 'rxjs';
 import { FormatPipe } from '../../../../../core/pipes/format.pipe';
 import { PersonService } from '../../../../../shared/services/person.service';
-import { PersonModel } from '../../../../../shared/models/person.model';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NewPersonFullComponent } from '../../../../../shared/components/new-person-full/new-person-full.component';
-import { ToastService } from '../../../../../core/services/toast.service';
 import { FinancialService } from '../../services/financial.service';
-import { FinancialOriginModel } from '../../models/financial.model';
-import { NewFinancialOriginComponent } from "../new-financial-origin/new-financial-origin.component";
+import { AccountService } from '../../../../../shared/services/account.service';
+import { ToastService } from '../../../../../core/services/toast.service';
+import { NewPersonFullComponent } from '../../../../../shared/components/new-person-full/new-person-full.component';
+import { NewFinancialOriginComponent } from '../new-financial-origin/new-financial-origin.component';
+import { NewFinancialCategoryComponent } from '../new-financial-category/new-financial-category.component';
 
 interface Installment {
   number: number;
@@ -40,117 +45,144 @@ interface Installment {
     NzFormModule,
     NzSelectModule,
     NzInputNumberModule,
+    NzInputModule,
     NzDatePickerModule,
     NzTableModule,
     NzSwitchModule,
+    NzAlertModule,
+    NzSpinModule,
     ReactiveFormsModule,
     FormatPipe,
     NzDividerModule,
     NewPersonFullComponent,
-    NewFinancialOriginComponent
-],
+    NewFinancialOriginComponent,
+    NewFinancialCategoryComponent,
+  ],
   providers: [FormatPipe],
   templateUrl: './new-financial-mov.component.html',
-  styleUrl: './new-financial-mov.component.scss',
 })
 export class NewFinancialMovComponent implements OnInit {
-  @Input() isVisible: boolean = false;
-  @Input() movType: number = 0;
-  @Input() title: string = 'Nova Movimentação';
+  @Input() isVisible = false;
+  @Input() movType = 0;
+  @Input() title = 'Nova Movimentação';
   @Output() close = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<any>();
 
-  public financialForm!: FormGroup;
-  public installments: Installment[] = [];
-
-  listPerson: PersonModel[] = [];
-  listOrigin: FinancialOriginModel[] = [];
-
-  isLoadingData = false;
+  financialForm!: FormGroup;
+  installments: Installment[] = [];
+  listPerson: any[] = [];
+  listOrigin: any[] = [];
+  listCategory: any[] = [];
+  listAccount: any[] = [];
+  isLoadingData = true;
   isPersonModalVisible = false;
-  isOriginModalVisible = true;
+  isOriginModalVisible = false;
+  isCategoryVisible = false;
 
-  readonly nzFilterOption = (): boolean => true;
+  readonly nzFilterOption = () => true;
 
   constructor(
     private fb: FormBuilder,
-    private formatPipe: FormatPipe,
     private personService: PersonService,
     private financialService: FinancialService,
+    private accountService: AccountService,
     private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
-    this.initForm();
-    this.watchChanges();
     this.loadData();
+    if (this.movType === 1) this.title = 'Nova Receita' 
   }
-
-  search(value: string): void {}
 
   async loadData() {
     this.isLoadingData = true;
-    await this.getPerson();
-    await this.getOrigin();
     try {
+      await lastValueFrom(
+        forkJoin({
+          persons: this.personService
+            .getPersonList('')
+            .pipe(tap((d) => (this.listPerson = d))),
+          origins: this.financialService
+            .getFinancialOrign()
+            .pipe(tap((d) => (this.listOrigin = d))),
+          categories: this.financialService
+            .getFinancialCategory()
+            .pipe(
+              tap(
+                (d) =>
+                  (this.listCategory = d.filter(
+                    (i) => i.type === this.movType,
+                  )),
+              ),
+            ),
+          accounts: this.accountService
+            .getAccountList()
+            .pipe(tap((d) => (this.listAccount = d))),
+        }),
+      );
+      this.initForm();
+      this.watchChanges();
     } catch (error) {
+      this.toastService.error('Erro ao carregar dados.');
     } finally {
       this.isLoadingData = false;
     }
   }
 
-  getPerson(): void {
-    this.isLoadingData = true;
-
-    this.personService.getPersonList('').subscribe({
-      next: (data: PersonModel[]) => {
-        this.listPerson = data;
-        this.isLoadingData = false;
-      },
-      error: (err) => {
-        console.error('Erro ao carregar pessoas:', err);
-        this.isLoadingData = false;
-      },
-    });
-  }
-
-  getOrigin(): void {
-    this.isLoadingData = true;
-
-    this.financialService.getFinancialOrign().subscribe({
-      next: (data: FinancialOriginModel[]) => {
-        this.listOrigin = data;
-        this.isLoadingData = false;
-      },
-      error: (err) => {
-        console.error('Erro ao carregar origens:', err);
-        this.isLoadingData = false;
-      },
-    });
-  }
-
-  private initForm(): void {
+  private initForm() {
     this.financialForm = this.fb.group({
       description: ['', [Validators.required, Validators.minLength(3)]],
-      type: [0, [Validators.required]],
+      type: [this.movType, [Validators.required]],
       totalAmount: [0, [Validators.required, Validators.min(0.01)]],
       installmentsCount: [1, [Validators.required, Validators.min(1)]],
+      documentDate: [new Date(), [Validators.required]],
       firstDueDate: [new Date(), [Validators.required]],
-      categoryId: [null, [Validators.required]],
+      categoryId: [null],
       originId: ['6d790e02-fbd6-4d7d-90b9-e8163e2b3672', [Validators.required]],
       personId: [null, [Validators.required]],
-      isPaid: [false],
+      isPaid: [true],
+      accountId: [this.listAccount[0]?.id],
+      isInstallment: [true],
+      paymentMethod: [null],
+      paymentDate: [new Date()],
     });
   }
 
-  private watchChanges(): void {
-    this.financialForm.valueChanges.subscribe(() => {
-      this.generateInstallments();
+  private watchChanges() {
+  this.financialForm.valueChanges.subscribe(() =>
+    this.generateInstallments(),
+  );
+
+  this.financialForm.get('isPaid')?.valueChanges.subscribe((isPaid) => {
+    const isInstallmentCtrl = this.financialForm.get('isInstallment');
+    if (isPaid) {
+      isInstallmentCtrl?.setValue(true, { emitEvent: true });
+      isInstallmentCtrl?.disable();
+    } else {
+      isInstallmentCtrl?.enable();
+    }
+  });
+
+  this.financialForm
+    .get('isInstallment')
+    ?.valueChanges.subscribe((isAtVista) => {
+      const dateCtrl = this.financialForm.get('firstDueDate');
+      const countCtrl = this.financialForm.get('installmentsCount');
+      
+      if (isAtVista) {
+        dateCtrl?.setValue(new Date());
+        countCtrl?.setValue(1);
+      } else {
+        if (!this.financialForm.get('isPaid')?.value) {
+           dateCtrl?.setValue(this.addWorkingDays(new Date(), 30));
+        }
+      }
     });
-  }
+}
 
   private generateInstallments(): void {
     const { totalAmount, installmentsCount, firstDueDate } =
-      this.financialForm.value;
+      this.financialForm.getRawValue();
 
     if (!totalAmount || !installmentsCount || !firstDueDate) {
       this.installments = [];
@@ -161,80 +193,149 @@ export class NewFinancialMovComponent implements OnInit {
     const remainder = parseFloat(
       (totalAmount - baseValue * installmentsCount).toFixed(2),
     );
-    const list: Installment[] = [];
 
-    for (let i = 0; i < installmentsCount; i++) {
+    this.installments = Array.from({ length: installmentsCount }, (_, i) => {
       const date = new Date(firstDueDate);
       date.setMonth(date.getMonth() + i);
-
-      list.push({
+      return {
         number: i + 1,
         dueDate: date,
         value:
           i === 0 ? parseFloat((baseValue + remainder).toFixed(2)) : baseValue,
+      };
+    });
+  }
+
+  handleOk() {
+    if (this.financialForm.invalid)
+      return this.validateForm(this.financialForm);
+    this.isLoadingData = true;
+    this.financialForm.disable();
+    const rawData = this.financialForm.getRawValue();
+    this.financialService
+      .postFinancialMov(this.sanitizeData(rawData))
+      .subscribe({
+        next: (res) => {
+          if (rawData.isPaid && res.id) {
+            const body = {
+              transactionId: res.id,
+              accountId: rawData.accountId,
+              totalAmountPaid: rawData.totalAmount,
+              paymentDate: rawData.paymentDate,
+              paymentMethod: rawData.paymentMethod,
+            };
+            this.financialService.postPaymentSettle(body).subscribe({
+              next: () => this.finalizeSuccess(res),
+              error: () => {
+                this.isLoadingData = false;
+                this.financialForm.enable();
+              },
+            });
+          } else this.finalizeSuccess(res);
+        },
+        error: () => {
+          this.isLoadingData = false;
+          this.financialForm.enable();
+        },
       });
-    }
-    this.installments = list;
   }
 
-  async onPersonCreated(newPerson: any) {
-    this.isPersonModalVisible = false;
-    await this.getPerson();
-    if (newPerson && newPerson.id) {
-      this.financialForm.patchValue({ personId: newPerson.id });
-    }
+  private finalizeSuccess(res: any) {
+    this.toastService.success('Sucesso.');
+    this.saved.emit(res);
+    this.isLoadingData = false;
+    this.handleCancel();
   }
 
-  handleOk(): void {
-    if (this.financialForm.valid) {
-      const payload = this.financialForm.value;
-
-      if (payload.isPaid) {
-        console.log('Executando 2 chamadas de API: Cadastro + Liquidação');
-      } else {
-        console.log('Executando 1 chamada de API: Apenas Cadastro');
+  private validateForm(form: any) {
+    Object.values(form.controls).forEach((c: any) => {
+      if (c instanceof FormGroup || c instanceof FormArray)
+        this.validateForm(c);
+      else {
+        c.markAsDirty();
+        c.updateValueAndValidity({ onlySelf: true });
       }
-
-      this.close.emit();
-    } else {
-      Object.values(this.financialForm.controls).forEach((control) => {
-        if (control.invalid) {
-          control.markAsDirty();
-          control.updateValueAndValidity({ onlySelf: true });
-        }
-      });
-    }
+    });
   }
 
-  handleCancel(): void {
+  private sanitizeData(data: any): any {
+    if (typeof data !== 'object' || data === null)
+      return data === '' ? null : data;
+    Object.keys(data).forEach((k) => (data[k] = this.sanitizeData(data[k])));
+    return data;
+  }
+
+  private addWorkingDays(date: Date, days: number): Date {
+    let d = new Date(date),
+      added = 0;
+    while (added < days) {
+      d.setDate(d.getDate() + 1);
+      if (d.getDay() !== 0 && d.getDay() !== 6) added++;
+    }
+    return d;
+  }
+
+  handleCancel() {
     this.close.emit();
   }
+  search(v: string) {}
+  trackByItem = (i: number, item: any) => item.id || i;
 
-  onCloseNewModal(modal: string){
-    if (modal === 'newPerson') {
-      this.isPersonModalVisible = false;
-    }else if (modal === 'newOrigin'){
-      this.isOriginModalVisible = false;
-    }
+  onOpenNewModal(m: string) {
+    if (m === 'newPerson') this.isPersonModalVisible = true;
+    else if (m === 'newOrigin') this.isOriginModalVisible = true;
+    else if (m === 'newCategory') this.isCategoryVisible = true;
   }
 
-  onOpenNewModal(modal: string){
-        if (modal === 'newPerson') {
-      this.isPersonModalVisible = true;
-    }else if (modal === 'newOrigin'){
-      this.isOriginModalVisible = true;
-    }
+  onCloseNewModal(m: string) {
+    if (m === 'newPerson') this.isPersonModalVisible = false;
+    else if (m === 'newOrigin') this.isOriginModalVisible = false;
+    else if (m === 'newCategory') this.isCategoryVisible = false;
   }
 
-  formatterReal = (value: number | string): string => {
-    return this.formatPipe.transform(value, 'currency');
-  };
-
-  parserReal = (value: string): string => {
-    return value.replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
-  };
-
-  trackByItem(index: number, item: any) {
-    return item;
+  async onPersonCreated(p: any) {
+    await lastValueFrom(
+      this.personService
+        .getPersonList('')
+        .pipe(tap((d) => (this.listPerson = d))),
+    );
+    if (p?.id) this.financialForm.patchValue({ personId: p.id });
+    this.onCloseNewModal('newPerson');
   }
+  async onOriginCreated(o: any) {
+    await lastValueFrom(
+      this.financialService
+        .getFinancialOrign()
+        .pipe(tap((d) => (this.listOrigin = d))),
+    );
+    if (o?.id) this.financialForm.patchValue({ originId: o.id });
+    this.onCloseNewModal('newOrigin');
+  }
+  async onCategoryCreated(c: any) {
+    await lastValueFrom(
+      this.financialService
+        .getFinancialCategory()
+        .pipe(
+          tap(
+            (d) =>
+              (this.listCategory = d.filter((i) => i.type === this.movType)),
+          ),
+        ),
+    );
+    if (c?.id) this.financialForm.patchValue({ categoryId: c.id });
+    this.onCloseNewModal('newCategory');
+  }
+
+  formatterReal = (v: any) =>
+    v
+      ? new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }).format(typeof v === 'string' ? parseFloat(v) : v)
+      : '';
+  parserReal = (v: string) =>
+    v
+      .replace(/R\$\s?|(?:\s)/g, '')
+      .replace(/\./g, '')
+      .replace(',', '.');
 }

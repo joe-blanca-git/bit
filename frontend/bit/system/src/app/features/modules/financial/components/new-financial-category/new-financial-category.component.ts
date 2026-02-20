@@ -13,9 +13,10 @@ import { ToastService } from '../../../../../core/services/toast.service';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @Component({
-  selector: 'app-new-financial-origin',
+  selector: 'app-new-financial-category',
   standalone: true,
   imports: [
     CommonModule,
@@ -24,17 +25,18 @@ import { NzFormModule } from 'ng-zorro-antd/form';
     NzButtonModule,
     NzModalModule,
     NzFormModule,
+    NzSelectModule,
   ],
-  templateUrl: './new-financial-origin.component.html',
-  styleUrl: './new-financial-origin.component.scss',
+  templateUrl: './new-financial-category.component.html',
+  styleUrl: './new-financial-category.component.scss',
 })
-export class NewFinancialOriginComponent {
+export class NewFinancialCategoryComponent {
   @Input() isVisible: boolean = false;
-  @Input() title: string = 'Nova Origem Financeira';
+  @Input() title: string = 'Nova Categoria Financeira';
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<any>();
 
-  public newFinancialOrigin!: FormGroup;
+  public newFinancialCategory!: FormGroup;
   isLoadingData = false;
 
   constructor(
@@ -48,21 +50,22 @@ export class NewFinancialOriginComponent {
   }
 
   private initForm(): void {
-    this.newFinancialOrigin = this.fb.group({
-      description: ['', [Validators.required]],
+    this.newFinancialCategory = this.fb.group({
+      name: ['', [Validators.required]],
+      type: ['', [Validators.required]],
     });
   }
 
   handleOk(): void {
-    if (this.newFinancialOrigin.valid) {
+    if (this.newFinancialCategory.valid) {
       this.isLoadingData = true;
 
-      const rawData = this.newFinancialOrigin.getRawValue();
+      const rawData = this.newFinancialCategory.getRawValue();
       const cleanPayload = this.sanitizeData(rawData);
 
-      this.financialService.postFinancialOrigin(cleanPayload).subscribe({
+      this.financialService.postFinancialCategpry(cleanPayload).subscribe({
         next: (res) => {
-          this.toastService.success('Origem Cadastrada com Sucesso.');
+          this.toastService.success('Categoria Cadastrada com Sucesso.');
           this.saved.emit(res);
         },
         error: (err) => {
@@ -71,7 +74,7 @@ export class NewFinancialOriginComponent {
         },
       });
     } else {
-      this.validateForm(this.newFinancialOrigin);
+      this.validateForm(this.newFinancialCategory);
     }
   }
 

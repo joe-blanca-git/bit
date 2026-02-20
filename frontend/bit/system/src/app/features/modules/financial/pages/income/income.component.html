@@ -1,44 +1,37 @@
 <div class="income">
-  <div class="header">
+  <div class="header mb-4">
     <div class="row w-100">
       <div class="col-6">
         <div class="breadcrumb d-none d-sm-block">
           <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-              <li class="breadcrumb-item">
-                <span>FINANCEIRO</span>
-              </li>
-              <li class="breadcrumb-item active">
-                <span>RECEITAS</span>
-              </li>
+              <li class="breadcrumb-item"><span>FINANCEIRO</span></li>
+              <li class="breadcrumb-item active"><span>RECEITAS</span></li>
             </ol>
           </nav>
         </div>
       </div>
       <div class="col-6 d-lg-flex justify-content-end gap-2 d-none">
-          <button class="btn btn-outline-primary">
-            <i class="fa fa-plus" aria-hidden="true"></i>&nbsp;
-            <span>Nova Receita</span>
-          </button>
-          <button class="btn btn-outline-primary">
-            <i class="fa fa-file-pdf" aria-hidden="true"></i>&nbsp;
-            <span>Imprimir</span>&nbsp;
-          </button>
+        <button class="btn btn-outline-primary" (click)="newFinancialMovStatusChange()">
+          <i class="fa fa-plus"></i>&nbsp;<span>Nova Receita</span>
+        </button>
+        <button class="btn btn-outline-primary">
+          <i class="fa fa-file-pdf"></i>&nbsp;<span>Exportar</span>
+        </button>
       </div>
     </div>
-    
-    
-    <div class="title">{{ title }}</div>
+    <div class="title text-success">
+      <i class="fa-solid fa-circle-dollar-to-slot text-success"></i>
+      {{ title }}
+    </div>
     <div class="description">{{ description }}</div>
   </div>
+
   <div class="content">
-
     <div class="cards-dash">
-
       <div class="row">
-
         <div class="col-6 col-md-4 col-lg-3 pb-2 flex-shrink-0" *ngFor="let item of dashboardCards">
-          <div class="card">
+          <div class="card" [ngClass]="item.bg">
             <div class="card-body">
               <div class="row align-items-center">
                 <div class="col-9 d-flex flex-column align-items-start">
@@ -52,60 +45,55 @@
             </div>
           </div>
         </div>
-
-        <div class="col-12 col-md-4 col-lg-6 d-flex flex-md-column flex-lg-row mb-2 pb-3 gap-2">
-          <div class="d-flex align-items-start justify-content-end flex-column">
-            
-          </div>
-          <div class="d-flex align-items-start justify-content-end flex-column">
-            
-          </div>
-        </div>
       </div>
 
-      <div class="row">
+      <div class="row mt-3">
         <div class="col-12 mb-2 col-md-4 col-lg-4 d-flex align-items-start justify-content-end flex-column">
-          <label for="source" class="text-secondary text-smaller">Pesquisar</label>
-          <input nz-input placeholder="" nzSize="default" />
+          <label class="text-secondary text-smaller">Pesquisar</label>
+          <input nz-input placeholder="Filtrar na lista..." (input)="onSearch($event)" />
         </div>
-        <div class="col-6 mb-2 col-md-4 col-lg-3 d-flex align-items-start justify-content-end flex-column">
-          <label for="date" class="text-secondary text-smaller">Lançamento</label>
-          <nz-range-picker class="w-100" id="date" [nzRanges]="ranges" ngModel ></nz-range-picker>
-        </div>
-        <div class="col-6 mb-2 col-md-4 col-lg-3 d-flex align-items-start justify-content-end flex-column">
-          <label for="dueDate" class="text-secondary text-smaller">Vencimento</label>
-          <nz-range-picker class="w-100" id="date" [nzRanges]="ranges" ngModel ></nz-range-picker>
+        <div class="col-12 mb-2 col-md-4 col-lg-3 d-flex align-items-start justify-content-end flex-column">
+          <label class="text-secondary text-smaller">Lançamento</label>
+          <nz-range-picker 
+            class="w-100" 
+            [(ngModel)]="dateRange" 
+            [nzRanges]="ranges" 
+            (ngModelChange)="loadData()" 
+            nzFormat="dd/MM/yyyy">
+          </nz-range-picker>
         </div>
       </div>
 
       <div class="row d-none d-lg-flex">
         <div class="col-12">
           <div class="card">
-            <div class="card-body" >
-              <nz-table #sortTable [nzData]="listOfData">
+            <div class="card-body">
+              <nz-table #sortTable [nzData]="filteredData" [nzLoading]="isLoadingData" nzSize="small">
                 <thead>
                   <tr>
-                    <th
-                      *ngFor="let column of listOfColumn; trackBy: trackColumn"
-                      [nzSortFn]="column.compare"
-                      [nzSortPriority]="column.priority"
-                    >
-                      {{ column.title }}
-                    </th>
+                    <th *ngFor="let col of listOfColumn" [nzSortFn]="col.compare">{{ col.title }}</th>
+                    <th class="text-center">Detalhes</th>
                   </tr>
                 </thead>
-
                 <tbody>
-                  <tr *ngFor="let data of sortTable.data; trackBy: trackData">
-                    <td>{{ data.date | format: "date"}}</td>
-                    <td>{{ data.dueDate | format: "date"}}</td>
+                  <tr *ngFor="let data of sortTable.data">
+                    <td>{{ data.documentDate | format: "date" }}</td>
+                    <td>{{ (data.installments?.[0]?.dueDate) | format: "date" }}</td>
+                    <td>{{ data.originDescription }}</td>
                     <td>{{ data.description }}</td>
-                    <td>{{ data.source }}</td>
-                    <td>{{ data.category }}</td>
-                    <td>{{ data.type }}</td>
-                    <td>{{ data.amount | format: "currency"}}</td>
-                    <td>{{ data.paid | format: "currency"}}</td>
-                    <td>{{ data.pending | format: "currency"}}</td>
+                    <td>{{ data.personName }}</td>
+                    <td>{{ data.categoryName }}</td>
+                    <td>{{ data.totalAmount | format: "currency" }}</td>
+                    <td class="text-danger fw-bold">{{ calculatePending(data) | format: "currency" }}</td>
+                    <td>
+                      <div class="row justify-content-center">
+                        <div class="col-auto">
+                          <button class="btn btn-sm btn-outline-primary" title="Visualizar Detalhes">
+                            <i class="fa fa-list-dots" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </td>
                   </tr>
                 </tbody>
               </nz-table>
@@ -115,66 +103,38 @@
       </div>
 
       <div class="row d-flex d-lg-none cards-mobile">
-        <div class="col-12 mb-2" *ngFor="let item of listOfData">
+        <div class="col-12 mb-2" *ngFor="let item of filteredData">
           <div class="card pt-3">
-            <button class="btn btn-sm btn-none position-absolute end-0 top-0">
-              <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-            </button>
             <div class="card-body">
               <div class="row">
-
                 <div class="col-6 text-start">
-                  <span class="card-label">Data</span>&nbsp;
-                  <span>{{ item.date | format: "date"}}</span>
+                  <span class="card-label">Data</span><br>
+                  <span>{{ item.documentDate | format: "date" }}</span>
                 </div>
                 <div class="col-6 text-end">
-                  <span class="card-label">Vencimento</span>&nbsp;
-                  <span>{{ item.date | format: "date"}}</span>
+                  <span class="card-label">Valor</span><br>
+                  <span class="fw-bold">{{ item.totalAmount | format: "currency" }}</span>
                 </div>
-
+                <div class="col-12"><hr></div>
+                <div class="col-12 mb-2">
+                  <span class="card-label">Pessoa:</span> {{ item.personName }}
+                </div>
                 <div class="col-12">
-                  <hr>
+                  <span class="card-label">Descrição:</span> {{ item.description }}
                 </div>
-
-                <div class="col-6">
-                  <div class="row text-start">
-                    <div class="col-12">
-                      <span class="card-label">Origem</span>&nbsp;
-                      <span>{{item.source}}</span>
-                    </div>
-                    <div class="col-12">
-                      <span class="card-label">Descrição</span>&nbsp;
-                      <span>{{item.description}}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-6">
-                  <div class="row text-end">
-                    <div class="col-12">
-                      <span class="card-label">Valor</span>&nbsp;
-                      <span>{{item.amount  | format: "currency"}}</span>
-                    </div>
-                    <div class="col-12">
-                      <span class="card-label">Pago</span>&nbsp;
-                      <span>{{item.paid  | format: "currency"}}</span>
-                    </div>
-                    <div class="col-12">
-                      <i [ngClass]="{'fa fa-exclamation-circle text-danger': item.pending > 0}"></i>
-                      <span class="card-label">Pendente</span>&nbsp;
-                      <span>{{item.pending  | format: "currency"}}</span>
-                    </div>
-                  </div>
-                </div>
-  
               </div>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
 
-<app-new-financial-mov [isVisible]="newFinancialMoveVisible"></app-new-financial-mov>
+<app-new-financial-mov 
+  *ngIf="newFinancialMoveVisible" 
+  [isVisible]="newFinancialMoveVisible" 
+  [movType]="1" 
+  (close)="newFinancialMovStatusChange()" 
+  (saved)="onCreatedFinancialmov($event)">
+</app-new-financial-mov>

@@ -25,9 +25,7 @@ export class SiderMenuComponent {
     const menu = this.menuService.getMenuAllowed();
     
     if (menu.length > 0) {
-      this.menu = menu;     
-      console.log(this.menu);
-       
+      this.menu = menu;            
     } 
   }
 

@@ -39,7 +39,7 @@ export class NewPersonFullComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<any>();
 
-  public nwePersonForm!: FormGroup;
+  public newPersonForm!: FormGroup;
   isLoadingData = false;
 
   constructor(
@@ -53,7 +53,7 @@ export class NewPersonFullComponent implements OnInit {
   }
 
   private initForm(): void {
-    this.nwePersonForm = this.fb.group({
+    this.newPersonForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       userType: ['CLIENT', [Validators.required]],
       profileData: this.fb.group({
@@ -82,7 +82,7 @@ export class NewPersonFullComponent implements OnInit {
   }
 
   get addresses(): FormArray {
-    return this.nwePersonForm.get('profileData.addresses') as FormArray;
+    return this.newPersonForm.get('profileData.addresses') as FormArray;
   }
 
   addAddress(): void {
@@ -95,28 +95,29 @@ export class NewPersonFullComponent implements OnInit {
     }
   }
 
-  handleOk(): void {
-    if (this.nwePersonForm.valid) {
-      this.isLoadingData = true;
-      const rawData = this.nwePersonForm.value;
-      const cleanPayload = this.sanitizeData(rawData);
+handleOk(): void {
+  if (this.newPersonForm.valid) {
+    this.isLoadingData = true;
 
-      this.personService.createPerson(cleanPayload).subscribe({
-        next: (res) => {
-          this.toastService.success('Pessoa Cadastrada com Sucesso.');
-          this.saved.emit(res);
-          this.handleCancel();
-        },
-        error: (err) => {
-          console.error('Erro ao salvar:', err);
-          this.isLoadingData = false;
-        },
-        complete: () => (this.isLoadingData = false),
-      });
-    } else {
-      this.validateForm(this.nwePersonForm);
-    }
+    const rawData = this.newPersonForm.getRawValue(); 
+    const cleanPayload = this.sanitizeData(rawData);
+
+    this.personService.createPerson(cleanPayload).subscribe({
+      next: (res) => {
+        this.toastService.success('Pessoa Cadastrada com Sucesso.');
+        this.saved.emit(res);
+        this.handleCancel();
+      },
+      error: (err) => {
+        console.error('Erro ao salvar:', err);
+        this.isLoadingData = false;
+      },
+      complete: () => (this.isLoadingData = false),
+    });
+  } else {
+    this.validateForm(this.newPersonForm);
   }
+}
 
   private sanitizeData(data: any): any {
     if (typeof data !== 'object' || data === null) {
@@ -142,7 +143,7 @@ export class NewPersonFullComponent implements OnInit {
   }
 
   handleCancel(): void {
-    this.nwePersonForm.reset();
+    this.newPersonForm.reset();
     this.close.emit();
   }
 }

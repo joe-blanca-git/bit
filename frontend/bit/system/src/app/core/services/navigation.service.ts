@@ -39,9 +39,14 @@ export class NavigationService {
       for (const record of data) {
         const { items, ...rest } = record;
 
+        // Ordenação alfabética do submenu
+        const sortedSubmenus = Array.isArray(items) 
+          ? [...items].sort((a, b) => a.title.localeCompare(b.title)) 
+          : [];
+
         const currentSection = {
           ...rest,
-          submenus: Array.isArray(items) ? items : [],
+          submenus: sortedSubmenus,
         };
 
         menu.push(currentSection);
